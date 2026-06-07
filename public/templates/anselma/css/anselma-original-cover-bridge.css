@@ -1,0 +1,3510 @@
+/* BRIDGE: Original Katsudoto Cover inside our Laravel preview */
+
+body.anselma-template {
+    --background-primary: #F5F2E4;
+    --background-primary-rgb: 245, 242, 228;
+
+    --background-secondary: #700F06;
+    --background-secondary-rgb: 112, 15, 6;
+
+    --background-tertiary: #FFFFFF;
+    --background-tertiary-rgb: 255, 255, 255;
+
+    --text-primary: #700F06;
+    --text-primary-rgb: 112, 15, 6;
+
+    --text-secondary: #8A643C;
+    --text-secondary-rgb: 138, 100, 60;
+
+    --text-tertiary: #E8E1D1;
+    --text-tertiary-rgb: 232, 225, 209;
+
+    --button-text-primary: #E8E1D1;
+    --button-text-primary-rgb: 232, 225, 209;
+
+    --button-background-primary: #700F06;
+    --button-background-primary-rgb: 112, 15, 6;
+
+    --button-text-secondary: #700F06;
+    --button-text-secondary-rgb: 112, 15, 6;
+
+    --button-background-secondary: #F5F2E4;
+    --button-background-secondary-rgb: 245, 242, 228;
+
+    --heading-family: "Pinyon Script", cursive;
+    --heading-style: normal;
+    --heading-weight: 400;
+    --heading-size: 52px;
+    --heading-lettercase: none;
+
+    --body-text-family: "Lancelot", serif;
+    --body-text-style: normal;
+    --body-text-weight: 400;
+    --body-text-size: 18px;
+    --body-text-lettercase: none;
+
+    --fs-extra-1: 2px;
+    --fs-extra-2: 4px;
+    --fs-extra-3: 5px;
+    --fs-extra-4: 6px;
+    --fs-extra-5: 10px;
+    --fs-extra-6: 12px;
+    --fs-extra-7: 15px;
+    --fs-extra-8: 20px;
+
+    --texture-1: url("/templates/anselma/files/texture-1.png");
+    --frame-cover-mask: url("/templates/anselma/files/mask-cover.png");
+    --mask-couple: url("/templates/anselma/files/frame-couple.png");
+
+    --secondary-clr: #E6E0CF;
+    --light-clr: #F5F2E4;
+    --dark-clr: #111827;
+    --roboto: Arial, sans-serif;
+}
+
+/* AOS ACTIVE MODE */
+/* Jangan paksa opacity dan transform, karena AOS butuh mengatur keduanya. */
+
+.anselma-template [data-aos] {
+    pointer-events: none;
+}
+
+.anselma-template [data-aos].aos-animate {
+    pointer-events: auto;
+}
+
+/* Original cover harus memenuhi kanan pane */
+.anselma-template section.cover.anselma-original-cover {
+    min-height: 100vh;
+    width: 100%;
+    background: var(--background-primary);
+}
+
+/* Inner cover juga dibuat full height */
+.anselma-template section.cover.anselma-original-cover .inner {
+    min-height: 100vh;
+}
+
+/* Guard agar gambar frame tidak ketarik */
+.anselma-template .anselma-original-cover .orn-cover-frame > .image-wrap > img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Logo guard */
+.anselma-template section.cover.anselma-original-cover .logo-wrap {
+    display: grid;
+    place-items: center;
+}
+
+.anselma-template section.cover.anselma-original-cover .logo-wrap img.logo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Font original cover */
+.anselma-template section.cover.anselma-original-cover h1 {
+    font-family: "Pinyon Script", cursive;
+}
+
+.anselma-template section.cover.anselma-original-cover p {
+    font-family: "Lancelot", serif;
+}
+
+/* Agar tidak ada jarak aneh di bagian atas saat masuk ke secondary-pane */
+.anselma-template .secondary-pane > section.cover.anselma-original-cover:first-child {
+    margin-top: 0;
+}
+
+/* Mobile guard */
+@media (max-width: 960px) {
+    body.anselma-template {
+        --heading-size: 58px;
+        --body-text-size: 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    body.anselma-template {
+        --heading-size: 44px;
+        --body-text-size: 16px;
+    }
+}
+
+/* FIX: use original Katsudoto cover-mask behavior */
+.anselma-template section.cover.anselma-original-cover .cover-mask {
+    position: absolute !important;
+    width: 100% !important;
+    height: 30% !important;
+    bottom: 0 !important;
+    top: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(
+        180deg,
+        rgba(245, 242, 228, 0.00) 0%,
+        var(--background-primary) 100%
+    ) !important;
+}
+
+/* Pastikan pseudo tambahan dari eksperimen sebelumnya tidak aktif */
+.anselma-template section.cover.anselma-original-cover .cover-mask::before,
+.anselma-template section.cover.anselma-original-cover .cover-mask::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* FIX: original gallery with real Slick, closer to Katsudoto */
+
+.anselma-template .photo-wrap .photo-nav-wrap,
+.anselma-template .photo-wrap .photo-slider-wrap {
+    position: relative;
+}
+
+/* Sebelum Slick selesai init, tampilkan hanya slide pertama */
+.anselma-template .photo-wrap .js-photo-main:not(.slick-initialized) .photo-item:not(:first-child),
+.anselma-template .photo-wrap .js-photo-thumbs:not(.slick-initialized) .photo-item:not(:first-child) {
+    display: none;
+}
+
+/* Biarkan Slick mengatur track/slide. Kita hanya atur container-nya. */
+.anselma-template .photo-wrap .js-photo-main,
+.anselma-template .photo-wrap .js-photo-thumbs {
+    width: 100%;
+}
+
+/* Area foto utama dibuat lebih kecil, seperti Katsudoto */
+.anselma-template .photo-wrap .js-photo-main .preview-wrap {
+    width: 75% !important;
+    max-width: 300px !important;
+    aspect-ratio: 246 / 328;
+    height: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Foto utama mengikuti ukuran preview-wrap */
+.anselma-template .photo-wrap .js-photo-main .photo-img-wrap,
+.anselma-template .photo-wrap .js-photo-main .photo-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.anselma-template .photo-wrap .js-photo-main .photo-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Thumbnail jangan ikut dipaksa width 100% */
+.anselma-template .photo-wrap .js-photo-thumbs .photo-item {
+    cursor: pointer;
+}
+
+.anselma-template .photo-wrap .js-photo-thumbs .photo-img-wrap {
+    width: auto;
+    height: 80px;
+}
+
+.anselma-template .photo-wrap .js-photo-thumbs .photo-img {
+    display: block;
+    width: auto;
+    min-width: 110px;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Link gallery */
+.anselma-template .photo-wrap .photo-link {
+    display: block;
+    text-decoration: none;
+}
+
+/* Sedikit rapikan jarak agar mirip original */
+.anselma-template .photo-wrap .photo-nav .slick-list {
+    padding: 4% 0 5%;
+}
+
+.anselma-template .photo-wrap .photo-slider-wrap {
+    margin-top: 2%;
+}
+
+/* Untuk tampilan lebih lebar, thumbnail mengikuti ukuran original */
+@media (min-width: 561px) {
+    .anselma-template .photo-wrap .js-photo-thumbs .photo-img-wrap {
+        height: 150px;
+    }
+
+    .anselma-template .photo-wrap .js-photo-thumbs .photo-img {
+        min-width: 200px;
+    }
+}
+
+/* FIX: original video section with simple YouTube iframe */
+
+.anselma-template section.video-gallery.original-video-section {
+    position: relative;
+    background: var(--background-primary);
+}
+
+.anselma-template section.video-gallery.original-video-section .preview {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #000;
+}
+
+.anselma-template section.video-gallery.original-video-section .anselma-youtube-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.anselma-template section.video-gallery.original-video-section .title h1 {
+    color: var(--text-primary);
+}
+
+.anselma-template section.video-gallery.original-video-section .title p {
+    color: var(--text-secondary);
+}
+
+/* ORIGINAL AGENDA SECTION */
+
+.anselma-template .original-agenda-section {
+    position: relative;
+    overflow: hidden;
+    padding: 18% 8% 20%;
+    background: var(--background-primary);
+}
+
+.anselma-template .original-agenda-section .agenda-inner {
+    position: relative;
+    z-index: 2;
+}
+
+.anselma-template .original-agenda-section .agenda-head {
+    text-align: center;
+    margin-bottom: 12%;
+}
+
+.anselma-template .original-agenda-section .agenda-title {
+    font-family: var(--heading-family);
+    font-size: clamp(42px, 11vw, 68px);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--text-primary);
+    margin: 0 0 14px;
+}
+
+.anselma-template .original-agenda-section .agenda-description {
+    font-family: var(--body-text-family);
+    font-size: clamp(16px, 4.4vw, 22px);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 auto;
+    max-width: 420px;
+}
+
+.anselma-template .original-agenda-section .agenda-body {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.anselma-template .original-agenda-section .agenda-card {
+    position: relative;
+    padding: 44px 24px 38px;
+    border: 1px solid rgba(138, 100, 60, 0.22);
+    border-radius: 28px;
+    background: rgba(255, 252, 243, 0.72);
+    box-shadow: 0 18px 45px rgba(112, 15, 6, 0.08);
+    text-align: center;
+    overflow: hidden;
+}
+
+.anselma-template .original-agenda-section .agenda-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.anselma-template .original-agenda-section .agenda-card-title {
+    font-family: var(--heading-family);
+    font-size: clamp(38px, 9vw, 56px);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--text-primary);
+    margin: 0 0 22px;
+}
+
+.anselma-template .original-agenda-section .agenda-day {
+    font-family: var(--body-text-family);
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+}
+
+.anselma-template .original-agenda-section .agenda-date {
+    font-family: var(--body-text-family);
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin: 0 0 6px;
+}
+
+.anselma-template .original-agenda-section .agenda-time {
+    font-family: var(--body-text-family);
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.anselma-template .original-agenda-section .agenda-location {
+    margin: 26px 0 24px;
+}
+
+.anselma-template .original-agenda-section .agenda-location h4 {
+    font-family: var(--body-text-family);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+}
+
+.anselma-template .original-agenda-section .agenda-location p {
+    font-family: var(--body-text-family);
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.anselma-template .original-agenda-section .agenda-map-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: var(--button-background-primary);
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: 17px;
+    text-decoration: none;
+    box-shadow: 0 12px 28px rgba(112, 15, 6, 0.18);
+}
+
+.anselma-template .original-agenda-section .agenda-card-orn {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.38;
+    z-index: 1;
+}
+
+.anselma-template .original-agenda-section .agenda-card-orn.top {
+    width: 42%;
+    top: -6%;
+    right: -10%;
+}
+
+.anselma-template .original-agenda-section .agenda-card-orn.bottom {
+    width: 46%;
+    bottom: -10%;
+    left: -12%;
+}
+
+.anselma-template .original-agenda-section .agenda-card-orn img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* =========================
+   DRESSCODE FIX - MATCH KATSUDOTO
+========================= */
+
+.anselma-template .dress-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 40px 20px 48px !important;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+.anselma-template .dress-inner {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.anselma-template .dress-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px !important;
+    text-align: center;
+}
+
+.anselma-template .dress-title {
+    margin: 0 !important;
+    font-family: var(--heading-family) !important;
+    font-size: var(--heading-size) !important;
+    font-weight: var(--heading-weight) !important;
+    font-style: var(--heading-style) !important;
+    text-transform: var(--heading-lettercase) !important;
+    line-height: 1 !important;
+    color: var(--text-primary) !important;
+    text-align: center !important;
+}
+
+.anselma-template .dress-desc {
+    max-width: 420px;
+    margin: 0 auto !important;
+    font-family: var(--body-text-family) !important;
+    font-size: var(--body-text-size) !important;
+    font-weight: var(--body-text-weight) !important;
+    text-transform: var(--body-text-lettercase) !important;
+    line-height: 1.45 !important;
+    color: var(--text-secondary) !important;
+    text-align: center !important;
+}
+
+/* dress list */
+.anselma-template .dress-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: center !important;
+}
+
+.anselma-template .dress-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: center !important;
+    width: 100%;
+    text-align: center;
+}
+
+.anselma-template .dress-item-title {
+    margin: 0 !important;
+    font-family: var(--body-text-family) !important;
+    font-size: var(--body-text-size) !important;
+    font-weight: var(--body-text-weight) !important;
+    text-transform: var(--body-text-lettercase) !important;
+    line-height: 1.3 !important;
+    color: var(--text-secondary) !important;
+    text-align: center !important;
+}
+
+/* preview wrapper */
+.anselma-template .dress-preview,
+.anselma-template .dress-preview.man-preview,
+.anselma-template .dress-preview.woman-preview {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #fff !important;
+    width: 92px !important;
+    height: 92px !important;
+    min-width: 92px !important;
+    min-height: 92px !important;
+    border-radius: 92px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+}
+
+/* icon */
+.anselma-template .dress-icon {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: auto !important;
+    height: auto !important;
+    text-align: center !important;
+}
+
+.anselma-template .dress-icon-img {
+    display: block !important;
+    width: 36px !important;
+    height: 36px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    margin: 0 auto !important;
+}
+
+.anselma-template .dress-icon .dress-icon-label,
+.anselma-template .dress-icon-label {
+    margin: 0 !important;
+    font-family: var(--montserrat, Arial, sans-serif) !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 1.1 !important;
+    color: var(--text-primary) !important;
+    text-align: center !important;
+}
+
+/* color list */
+.anselma-template .dress-color-list {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 auto !important;
+    max-width: 240px !important;
+    padding: 0 !important;
+}
+
+.anselma-template .dress-color-item {
+    background: var(--bg-color) !important;
+    border: 1px solid #fff !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 32px !important;
+    box-shadow: none !important;
+    display: block !important;
+}
+
+/* footer section */
+.anselma-template .dress-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 34px !important;
+    padding-top: 22px !important;
+    border-top: 1px solid rgba(138, 100, 60, 0.65) !important;
+}
+
+.anselma-template .dress-note {
+    margin: 0 auto !important;
+    max-width: 460px !important;
+    font-family: var(--body-text-family) !important;
+    font-size: var(--body-text-size) !important;
+    font-weight: var(--body-text-weight) !important;
+    text-transform: var(--body-text-lettercase) !important;
+    line-height: 1.45 !important;
+    color: var(--text-secondary) !important;
+    text-align: center !important;
+    font-style: normal !important;
+}
+
+/* MOBILE TUNING */
+@media (max-width: 560px) {
+    .anselma-template .dress-wrapper {
+        padding: 34px 20px 42px !important;
+    }
+
+    .anselma-template .dress-header {
+        gap: 10px;
+        margin-bottom: 30px !important;
+    }
+
+    .anselma-template .dress-title {
+        font-size: 52px !important;
+    }
+
+    .anselma-template .dress-desc {
+        font-size: 18px !important;
+        max-width: 360px;
+    }
+
+    .anselma-template .dress-list {
+        gap: 16px !important;
+    }
+
+    .anselma-template .dress-item-title {
+        font-size: 18px !important;
+    }
+
+    .anselma-template .dress-preview,
+    .anselma-template .dress-preview.man-preview,
+    .anselma-template .dress-preview.woman-preview {
+        width: 92px !important;
+        height: 92px !important;
+        min-width: 92px !important;
+        min-height: 92px !important;
+    }
+
+    .anselma-template .dress-color-item {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .anselma-template .dress-footer {
+        margin-top: 30px !important;
+        padding-top: 20px !important;
+    }
+
+    .anselma-template .dress-note {
+        font-size: 18px !important;
+        max-width: 360px;
+    }
+}
+
+/* =========================
+   RSVP HYBRID KATSUDOTO + CUSTOM INPUT
+========================= */
+
+.anselma-template .anselma-rsvp-original {
+    position: relative;
+    overflow: hidden;
+    padding: 0 0 10%;
+    background: var(--background-primary);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-inner {
+    position: relative;
+    padding: 5% 10.25% 0;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-body-wrapper {
+    max-width: 500px;
+    position: relative;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-radius: 24px;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    text-align: center;
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-top {
+    position: relative;
+    margin: 0 auto;
+    width: clamp(160px, 41%, 200px);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-title {
+    margin: 0;
+    font-family: var(--heading-family);
+    font-size: calc(var(--heading-size) + 0px);
+    font-weight: var(--heading-weight);
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-desc-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+    text-align: center;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-desc {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-body {
+    position: relative;
+    width: 100%;
+}
+
+/* Form box */
+.anselma-template .anselma-rsvp-original .rsvp-form-wrapper {
+    padding: 24px;
+    margin-top: 24px;
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.anselma-template .anselma-rsvp-original .bg-rsvp {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    border-radius: 24px;
+    background: var(--background-secondary);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-form-content {
+    position: relative;
+    z-index: 2;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-field label,
+.anselma-template .anselma-rsvp-original .rsvp-status-caption,
+.anselma-template .anselma-rsvp-original .rsvp-amount-caption {
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--button-text-primary);
+    text-align: center;
+}
+
+.anselma-template .anselma-rsvp-original input[type="text"],
+.anselma-template .anselma-rsvp-original input[type="number"],
+.anselma-template .anselma-rsvp-original textarea {
+    width: 100%;
+    outline: none;
+    border: 1px solid var(--button-background-secondary);
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: transparent;
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    box-sizing: border-box;
+}
+
+.anselma-template .anselma-rsvp-original textarea {
+    resize: vertical;
+}
+
+.anselma-template .anselma-rsvp-original input[readonly] {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-field small {
+    font-family: var(--body-text-family);
+    font-size: 14px;
+    color: rgba(var(--button-text-primary-rgb), 0.8);
+    text-align: center;
+}
+
+/* Status buttons */
+.anselma-template .anselma-rsvp-original .rsvp-confirm-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-confirm-wrap > label {
+    display: block;
+    width: 100%;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-status-wrap input[name="attendance_status"] {
+    display: none;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-confirm-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 0 auto;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+    line-height: 1.5;
+    background-color: var(--button-background-secondary);
+    color: var(--button-text-secondary);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    border: none;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-confirm-btn.going,
+.anselma-template .anselma-rsvp-original .rsvp-confirm-btn.not-going {
+    background-color: transparent;
+    border: 1px solid var(--button-background-secondary);
+    color: var(--button-background-secondary);
+}
+
+.anselma-template .anselma-rsvp-original input[name="attendance_status"]:checked + .rsvp-confirm-btn.going,
+.anselma-template .anselma-rsvp-original input[name="attendance_status"]:checked + .rsvp-confirm-btn.not-going {
+    background-color: var(--button-background-secondary);
+    color: var(--button-text-secondary);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-confirm-btn.confirm {
+    border: none;
+    background-color: var(--button-background-secondary);
+    color: var(--button-text-secondary);
+    min-height: 100%;
+    border-radius: 12px;
+}
+
+/* Preview status */
+.anselma-template .anselma-rsvp-original .rsvp-preview-status {
+    margin: 4px 0 18px;
+    font-family: var(--body-text-family);
+    font-size: 16px;
+    color: rgba(var(--button-text-primary-rgb), 0.82);
+    text-align: center;
+}
+
+/* Result message */
+.anselma-template .anselma-rsvp-original .rsvp-message-wrap {
+    position: relative;
+    margin-top: 24px;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-message-content {
+    background-color: transparent;
+    border-radius: 5px;
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-message-icon-wrap {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--background-secondary);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-result-icon {
+    color: var(--button-text-primary);
+    font-family: Arial, sans-serif;
+    font-size: 32px;
+    line-height: 1;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-message-title {
+    margin: 0 0 14px;
+    font-family: var(--heading-family);
+    font-size: calc(var(--heading-size));
+    color: var(--text-primary);
+    font-weight: var(--heading-weight);
+    line-height: 1;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-message-caption {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-change-wrap {
+    margin-top: 16px;
+}
+
+.anselma-template .anselma-rsvp-original .is-hidden {
+    display: none !important;
+}
+
+/* =========================
+   RSVP ORIGINAL ORNAMENTS
+========================= */
+
+.anselma-template .anselma-rsvp-original .rsvp-body {
+    position: relative;
+    width: 100%;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-original-ornaments {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-form-wrapper,
+.anselma-template .anselma-rsvp-original .rsvp-message-wrap {
+    position: relative;
+    z-index: 3;
+}
+
+/* Divider ornament */
+.anselma-template .anselma-rsvp-original .orn-rsvp-divid {
+    position: relative;
+    width: 78%;
+    margin: 0 auto 16px;
+    z-index: 2;
+}
+
+/* Right side flowers */
+.anselma-template .anselma-rsvp-original .orn-rsvp-1.right {
+    position: absolute;
+    width: 27.64%;
+    right: 0;
+    bottom: 0;
+    transform: translate(55.65%, 0%) scaleX(-1);
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-2.right {
+    position: absolute;
+    width: 71.61%;
+    right: 0;
+    bottom: 9%;
+    transform: translate(50%, -2%);
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-2-1 {
+    position: absolute;
+    width: 40.54%;
+    left: 27%;
+    top: 0%;
+    transform: translate(0%, -2%) rotate(21deg) scaleX(-1);
+}
+
+/* Left side flowers */
+.anselma-template .anselma-rsvp-original .orn-rsvp-1.left {
+    position: absolute;
+    width: 27.64%;
+    left: 0;
+    bottom: 0;
+    transform: translate(-55.65%, 0%);
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-2.left {
+    position: absolute;
+    width: 71.61%;
+    left: 0;
+    bottom: 9%;
+    transform: translate(-50%, -2%) scaleX(-1);
+}
+
+/* Bottom cloud ornaments */
+.anselma-template .anselma-rsvp-original .orn-rsvp-3.right {
+    position: absolute;
+    width: 35.16%;
+    right: 0;
+    bottom: 0;
+    transform: translate(32.11%, 23.88%);
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-3.left {
+    position: absolute;
+    width: 35.16%;
+    left: 0;
+    bottom: 0;
+    transform: translate(-32.11%, 23.88%) scaleX(-1);
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-3-1 {
+    position: absolute;
+    width: 128.44%;
+    right: 0;
+    bottom: 0;
+    transform: translate(2.11%, 29.31%);
+}
+
+/* Image defaults */
+.anselma-template .anselma-rsvp-original .rsvp-original-ornaments .image-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-original-ornaments img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Motion seperti Katsudoto */
+.anselma-template .anselma-rsvp-original .orn-rsvp-1 > .image-wrap img {
+    transform-origin: 50% 100%;
+    animation: goyang 6s ease-in-out infinite alternate;
+}
+
+.anselma-template .anselma-rsvp-original .orn-rsvp-2-1 > .image-wrap img {
+    transform-origin: 50% 100%;
+    animation: goyang 4s ease-in-out infinite alternate;
+}
+
+/* Supaya ornamen tidak keluar terlalu jauh di mobile kecil */
+@media (max-width: 560px) {
+    .anselma-template .anselma-rsvp-original .orn-rsvp-2.right {
+        transform: translate(52%, -2%);
+    }
+
+    .anselma-template .anselma-rsvp-original .orn-rsvp-2.left {
+        transform: translate(-52%, -2%) scaleX(-1);
+    }
+
+    .anselma-template .anselma-rsvp-original .orn-rsvp-3.right {
+        transform: translate(28%, 22%);
+    }
+
+    .anselma-template .anselma-rsvp-original .orn-rsvp-3.left {
+        transform: translate(-28%, 22%) scaleX(-1);
+    }
+}
+
+/* =========================
+   RSVP LOGIC STATE FIX
+========================= */
+
+.anselma-template .anselma-rsvp-original .is-hidden {
+    display: none !important;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-form-content {
+    position: relative;
+    z-index: 2;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-status-body input[name="attendance_status"],
+.anselma-template .anselma-rsvp-original .session-btn-wrap input[type="checkbox"] {
+    display: none;
+}
+
+.anselma-template .anselma-rsvp-original .check-rsvp {
+    display: none;
+    margin-left: 8px;
+}
+
+.anselma-template .anselma-rsvp-original input[name="attendance_status"]:checked + .rsvp-confirm-btn .check-rsvp,
+.anselma-template .anselma-rsvp-original .session-btn-wrap input[type="checkbox"]:checked + .rsvp-session-btn .check-rsvp {
+    display: inline-flex;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-amount-controller .toggle-text {
+    display: inline-block;
+    font-size: 26px;
+    line-height: 1;
+    font-family: var(--body-text-family);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-amount-controller .toggle-btn.is-disabled {
+    opacity: 0.42;
+    pointer-events: none;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-message-icon-wrap {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 18px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--background-secondary);
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-result-icon {
+    color: var(--button-text-primary);
+    font-family: Arial, sans-serif;
+    font-size: 32px;
+    line-height: 1;
+}
+
+.anselma-template .anselma-rsvp-original .rsvp-message-wrap.not-going .rsvp-message-icon-wrap {
+    background: var(--text-secondary);
+}
+
+/* ==============================
+   LIVE STREAMING - KATSUDOTO STYLE
+============================== */
+
+.anselma-template section.live-streaming {
+    padding: 5% 40px 8%;
+    position: relative;
+    overflow: hidden;
+    background: var(--background-primary);
+}
+
+.anselma-template section.live-streaming .inner {
+    padding: 0;
+    max-width: 540px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 3;
+}
+
+/* head */
+.anselma-template section.live-streaming .inner .head {
+    text-align: center;
+    padding: 0;
+    margin-bottom: 8%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.anselma-template section.live-streaming .inner .head h1 {
+    padding: 0;
+    margin: 0;
+    font-family: var(--heading-family);
+    font-size: var(--heading-size);
+    font-weight: var(--heading-weight);
+    line-height: 1;
+    color: var(--text-primary);
+}
+
+.anselma-template section.live-streaming .inner .head p {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-secondary);
+    line-height: 150%;
+    font-style: normal;
+}
+
+/* body */
+.anselma-template .live-streaming .inner .body {
+    position: relative;
+    padding: 0;
+}
+
+.anselma-template .live-streaming .inner .body p {
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-tertiary);
+    text-align: center;
+    padding-top: 16px;
+}
+
+.anselma-template .live-streaming .inner .body p.meeting-text {
+    font-family: var(--body-text-family);
+    font-weight: 500;
+    font-size: calc(var(--body-text-size) + var(--fs-extra-1));
+}
+
+/* card merah */
+.anselma-template .live-streaming .inner .body > .streaming-info {
+    position: relative;
+    z-index: 3;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--background-secondary);
+    box-shadow: 4px 1px 4px 0 rgba(97, 97, 97, 0.15);
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div {
+    padding: 0;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div.zoom-details {
+    padding: 0 24px;
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div.zoom-details > div {
+    margin: 0;
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* preview */
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview {
+    width: 70px;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview,
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview > img {
+    border-radius: 0;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview.wide {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview.wide > img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview.wide.youtube {
+    height: 200px;
+}
+
+/* play button */
+.anselma-template .live-streaming .inner .body > .streaming-info > div > .preview > .play-btn {
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
+    background-color: var(--button-background-secondary);
+    color: var(--button-text-secondary);
+    border: none;
+    border-radius: 50%;
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    opacity: 0.88;
+    z-index: 3;
+}
+
+.anselma-template .live-streaming .play-btn i {
+    display: inline-block;
+}
+
+.anselma-template .live-streaming .play-icon-fallback {
+    display: none;
+    line-height: 1;
+    transform: translateX(2px);
+}
+
+/* kalau Font Awesome tidak kebaca, fallback tetap muncul */
+.anselma-template .live-streaming .play-btn i:empty + .play-icon-fallback {
+    display: inline-block;
+}
+
+/* link */
+.anselma-template .live-streaming .inner .body > .streaming-info > div.link {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div.link > a {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    width: 100%;
+    font-family: var(--body-text-family);
+    font-weight: 400;
+    font-size: var(--body-text-size);
+    background-color: var(--button-background-secondary);
+    color: var(--button-text-secondary);
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.anselma-template .live-streaming .inner .body > .streaming-info > div.link > a:hover {
+    background-color: rgba(var(--button-background-tertiary-rgb), .8);
+    color: var(--button-text-tertiary);
+}
+
+/* ==============================
+   LIVE STREAMING ORNAMENTS
+============================== */
+
+.anselma-template section.live-streaming .body > .ornaments-wrapper {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* kanan atas/samping card */
+.anselma-template section.live-streaming .orn-lv-1.right {
+    position: absolute;
+    width: 33%;
+    right: 0;
+    top: 5%;
+    transform: translate(47%, -12%);
+    z-index: 2;
+}
+
+.anselma-template section.live-streaming .orn-lv-1-1 {
+    position: absolute;
+    width: 58%;
+    left: 0;
+    bottom: 0;
+    transform: translate(-42%, 8%) rotate(-8deg);
+}
+
+/* bunga kecil kiri bawah card */
+.anselma-template section.live-streaming .orn-lv-2 {
+    position: absolute;
+    width: 24%;
+    left: 0;
+    bottom: 4%;
+    transform: translate(-45%, 10%);
+    z-index: 4;
+}
+
+/* ornamen tambahan kiri bawah */
+.anselma-template section.live-streaming .orn-lv-3 {
+    position: absolute;
+    width: 38%;
+    left: 0;
+    bottom: -4%;
+    transform: translate(-30%, 25%);
+    z-index: 4;
+}
+
+/* awan / ornament bawah kiri */
+.anselma-template section.live-streaming .orn-lv-4 {
+    position: absolute;
+    width: 34%;
+    left: 0;
+    bottom: 0;
+    transform: translate(-26%, 30%);
+    z-index: 5;
+}
+
+.anselma-template section.live-streaming .orn-lv-4-1 {
+    position: absolute;
+    width: 80%;
+    right: 0;
+    bottom: 0;
+    transform: translate(28%, 16%);
+}
+
+/* ornament kecil atas card */
+.anselma-template section.live-streaming .orn-lv-5 {
+    position: absolute;
+    width: 22%;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -46%);
+    z-index: 1;
+}
+
+.anselma-template section.live-streaming .orn-lv-1 img,
+.anselma-template section.live-streaming .orn-lv-1-1 img,
+.anselma-template section.live-streaming .orn-lv-2 img,
+.anselma-template section.live-streaming .orn-lv-3 img,
+.anselma-template section.live-streaming .orn-lv-4 img,
+.anselma-template section.live-streaming .orn-lv-4-1 img,
+.anselma-template section.live-streaming .orn-lv-5 img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* animasi halus seperti template */
+.anselma-template section.live-streaming .orn-lv-1 > .image-wrap img,
+.anselma-template section.live-streaming .orn-lv-2 > .image-wrap img,
+.anselma-template section.live-streaming .orn-lv-3 > .image-wrap img {
+    transform-origin: 50% 100%;
+    animation: goyang 5s ease-in-out infinite alternate;
+}
+
+/* Responsive */
+@media (min-width: 768px) and (max-width: 960px) {
+    .anselma-template section.live-streaming {
+        padding-bottom: 7%;
+    }
+
+    .anselma-template .live-streaming .inner .body > .streaming-info > div > .preview.wide {
+        height: 320px;
+    }
+}
+
+@media (min-width: 425px) {
+    .anselma-template .live-streaming .inner .body > .streaming-info > div > .preview.wide.youtube {
+        height: 360px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .anselma-template .live-streaming .inner .body > .streaming-info > div > .preview.wide {
+        height: 320px;
+    }
+}
+
+@media (max-width: 560px) {
+    .anselma-template section.live-streaming {
+        padding: 7% 40px 10%;
+    }
+
+    .anselma-template section.live-streaming .orn-lv-1.right {
+        width: 36%;
+        transform: translate(52%, -10%);
+    }
+
+    .anselma-template section.live-streaming .orn-lv-2 {
+        width: 26%;
+        transform: translate(-50%, 8%);
+    }
+
+    .anselma-template section.live-streaming .orn-lv-3 {
+        width: 42%;
+        transform: translate(-34%, 24%);
+    }
+
+    .anselma-template section.live-streaming .orn-lv-4 {
+        width: 38%;
+        transform: translate(-30%, 32%);
+    }
+
+    .anselma-template section.live-streaming .orn-lv-5 {
+        width: 24%;
+        transform: translate(-50%, -44%);
+    }
+}
+
+/* =========================================================
+   WEDDING GIFT FINAL FIX
+   Fix typography, accordion, confirmation form, and inputs
+========================================================= */
+
+/* Section spacing */
+.anselma-template .wedding-gift-wrap {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 0 8%;
+    overflow: hidden;
+    background: var(--background-primary);
+}
+
+/* Head */
+.anselma-template .wedding-gift-head {
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.anselma-template .wedding-gift-head .orn-agenda-top {
+    width: clamp(120px, 32%, 180px);
+    margin: 0 auto;
+}
+
+/* Force heading back to Anselma script */
+.anselma-template .wedding-gift-head .wedding-gift-title {
+    margin: 0;
+    padding: 0;
+    font-family: var(--heading-family) !important;
+    font-size: var(--heading-size) !important;
+    font-weight: var(--heading-weight) !important;
+    line-height: 1 !important;
+    color: var(--text-primary) !important;
+    text-align: center;
+}
+
+/* Description should be body text, not large bold text */
+.anselma-template .wedding-gift-head .wedding-gift-description {
+    margin: 0 auto;
+    max-width: 520px;
+    font-family: var(--body-text-family) !important;
+    font-size: var(--body-text-size) !important;
+    font-weight: var(--body-text-weight) !important;
+    line-height: 1.5 !important;
+    color: var(--text-secondary) !important;
+    text-align: center;
+}
+
+/* Body width */
+.anselma-template .wedding-gift-body-wrap,
+.anselma-template .wedding-gift-body {
+    position: relative;
+    width: 100%;
+}
+
+.anselma-template .wedding-gift-body .wedding-gift-body-inner {
+    position: relative;
+    padding: 0 24px;
+    margin: 0 auto;
+}
+
+.anselma-template .wedding-gift-form {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+/* Form slide base */
+.anselma-template #weddingGiftForm {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    max-width: 635px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.anselma-template #weddingGiftForm .wedding-gift-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    transition: all 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Bank accordion button */
+.anselma-template .accor-bank-wrap {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.anselma-template .bank-btn-accordion {
+    width: 100%;
+    min-height: 56px;
+    border: none !important;
+    outline: none !important;
+    appearance: none;
+    box-shadow: none !important;
+    cursor: pointer;
+
+    background: var(--button-background-primary);
+    color: var(--button-text-primary);
+    border-radius: 12px;
+    padding: 12px 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+}
+
+.anselma-template .bank-btn-accordion:focus,
+.anselma-template .bank-btn-accordion:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.anselma-template .bank-btn-accordion .bank-btop-txt {
+    margin: 0;
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+    line-height: 1.2;
+}
+
+.anselma-template .bank-accordion-icon {
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: 20px;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.anselma-template .accor-bank-wrap.accor-active .bank-accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* Gift frame */
+.anselma-template .wedding-gift-inner .gift-frame {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 650px;
+    margin: 5% 0;
+    height: auto;
+    border: none;
+    display: none;
+}
+
+.anselma-template .wedding-gift-inner .gift-frame.active {
+    display: block !important;
+}
+
+.anselma-template .wedding-gift-inner .gift-frame .frame-wrap {
+    width: 100%;
+    border: none;
+    margin: 0 auto;
+    position: relative;
+}
+
+.anselma-template .wedding-gift-body-ins {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    margin: 0 auto;
+    padding: 22% 20% 17%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Bank detail */
+.anselma-template .wedding-gift-bank-wrap {
+    width: 100%;
+}
+
+.anselma-template .wedding-gift-bank-wrap .bank-item.show {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+}
+
+.anselma-template .wedding-gift-bank-wrap .bank-detail {
+    width: 100%;
+    flex-grow: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.anselma-template .wedding-gift-bank-wrap .bank-name {
+    margin: 0;
+    font-size: var(--body-text-size);
+    font-family: var(--body-text-family);
+    font-weight: 400;
+    color: var(--text-primary);
+}
+
+.anselma-template .wedding-gift-bank-wrap .bank-account-number-label,
+.anselma-template .wedding-gift-bank-wrap .bank-account-name-label {
+    margin: 0;
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-direction: column;
+    line-height: 1.5;
+
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: rgba(var(--text-secondary-rgb), 0.5);
+}
+
+.anselma-template .wedding-gift-bank-wrap .bank-account-number,
+.anselma-template .wedding-gift-bank-wrap .bank-account-name {
+    font-size: var(--body-text-size);
+    font-family: var(--body-text-family);
+    font-weight: 400;
+    color: var(--text-primary);
+    word-break: break-all;
+}
+
+/* Copy bank button */
+.anselma-template .bank-button-wrap {
+    border: none !important;
+    outline: none !important;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 0;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--button-background-primary) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--button-background-primary);
+}
+
+.anselma-template .bank-button-wrap .p,
+.anselma-template .bank-button-wrap p {
+    margin: 0;
+    color: var(--button-background-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+}
+
+/* Confirmation Form toggle, remove blue browser outline */
+.anselma-template .slider-bank-wrap {
+    width: 100%;
+    border: none !important;
+    outline: none !important;
+    appearance: none;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 12px 0;
+    margin: 0;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.anselma-template .slider-bank-wrap:focus,
+.anselma-template .slider-bank-wrap:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.anselma-template .slider-bank-wrap .sld-bank {
+    margin: 0;
+    color: var(--text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+}
+
+.anselma-template .slider-bank-icon {
+    font-family: var(--body-text-family);
+    font-size: 20px;
+    color: var(--text-primary);
+    transition: transform 0.3s ease;
+}
+
+.anselma-template .slider-bank-wrap.active .slider-bank-icon {
+    transform: rotate(180deg);
+}
+
+/* Sender form */
+.anselma-template .gift-form-sender-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Optional: uncomment kalau mau confirmation form hidden dulu */
+/*
+.anselma-template .gift-form-sender-wrapper {
+    display: none;
+}
+.anselma-template .gift-form-sender-wrapper.is-open {
+    display: flex;
+}
+*/
+
+.anselma-template .wedding-gift-sender-data-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.anselma-template .wedding-gift-sender-data-wrap .form-group {
+    width: 100%;
+    margin: 0;
+}
+
+.anselma-template .wedding-gift-sender-data-wrap .form-control {
+    width: 100% !important;
+    max-width: none !important;
+    display: block;
+    box-sizing: border-box;
+
+    background-color: transparent;
+    border-radius: 12px;
+    border: 1px solid var(--button-background-primary);
+    padding: 12px 16px;
+
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+    color: var(--text-secondary);
+}
+
+.anselma-template .wedding-gift-sender-data-wrap textarea.form-control {
+    min-height: 48px;
+    resize: vertical;
+}
+
+.anselma-template .wedding-gift-sender-data-wrap .form-control::placeholder {
+    color: rgba(var(--text-secondary-rgb), 0.5);
+}
+
+.anselma-template .wedding-gift-sender-data-wrap .form-control:focus,
+.anselma-template .wedding-gift-sender-data-wrap .form-control:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: var(--button-background-primary);
+}
+
+/* Next button */
+.anselma-template .wedding-gift-page-wrap {
+    width: 100%;
+}
+
+.anselma-template .wedding-gift-page {
+    width: 100%;
+    display: block;
+    border: none;
+    outline: none;
+    box-shadow: none;
+
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+    line-height: normal;
+
+    color: var(--button-text-primary);
+    background-color: var(--button-background-primary);
+
+    padding: 12px 25px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    margin: 0 auto;
+}
+
+/* Picture slide */
+.anselma-template .wedding-gift-picture {
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+    opacity: 0;
+}
+
+.anselma-template #weddingGiftForm.is-picture-step .wedding-gift__first-slide {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.anselma-template #weddingGiftForm.is-picture-step .wedding-gift-picture {
+    transform: translateX(-100%);
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Mobile tuning */
+@media (max-width: 560px) {
+    .anselma-template .wedding-gift-wrap {
+        padding: 40px 0 10%;
+    }
+
+    .anselma-template .wedding-gift-head {
+        width: 86%;
+    }
+
+    .anselma-template .wedding-gift-body .wedding-gift-body-inner {
+        padding: 0 24px;
+    }
+
+    .anselma-template .bank-btn-accordion {
+        min-height: 52px;
+        padding: 12px 18px;
+    }
+
+    .anselma-template .wedding-gift-body-ins {
+        padding: 20% 18% 16%;
+    }
+}
+
+/* =========================================================
+   WEDDING GIFT FIX - USE ORIGINAL KATSUDOTO ORNAMENT VALUES
+========================================================= */
+
+/* Jangan clip ornamen bank */
+.anselma-template #weddingGiftForm {
+    align-items: flex-end !important;
+    overflow: visible !important;
+}
+
+.anselma-template #weddingGiftForm .wedding-gift-slide {
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    overflow: visible !important;
+}
+
+.anselma-template .wedding-gift-inner .gift-frame,
+.anselma-template .wedding-gift-inner .gift-frame .frame-wrap {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* Frame bank tetap muncul saat accordion aktif */
+.anselma-template .wedding-gift-inner .gift-frame.bankItemAccordion {
+    display: none !important;
+}
+
+.anselma-template .wedding-gift-inner .gift-frame.bankItemAccordion.active {
+    display: block !important;
+}
+
+/* Wrapper ornament bank */
+.anselma-template .wedding-gift-inner .gift-frame > .ornaments-wrapper {
+    position: absolute !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    overflow: visible !important;
+    z-index: 4 !important;
+}
+
+.anselma-template .wedding-gift-inner .gift-frame .frame-wrap {
+    z-index: 2 !important;
+}
+
+.anselma-template .wedding-gift-body-ins {
+    z-index: 5 !important;
+}
+
+/* Image default */
+.anselma-template .wedding-gift-inner .gift-frame .ornaments-wrapper img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* =========================
+   BANK ORNAMENTS - ORIGINAL VALUES
+========================= */
+
+.anselma-template .orn-bank-1 {
+    position: absolute !important;
+    width: 48.82% !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    transform: translate(-21%, 11%) !important;
+    z-index: 5 !important;
+}
+
+.anselma-template .orn-bank-1-1 {
+    position: absolute !important;
+    width: 67.7% !important;
+    left: 0 !important;
+    top: 0 !important;
+    transform: translate(-16.8%, -29.26%) !important;
+    z-index: 2 !important;
+}
+
+.anselma-template .orn-bank-1-1-1 {
+    position: absolute !important;
+    width: 73.77% !important;
+    left: 13.33% !important;
+    top: 0 !important;
+    transform: translate(0%, -55%) !important;
+    z-index: 3 !important;
+}
+
+.anselma-template .orn-bank-2 {
+    position: absolute !important;
+    width: 39.55% !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: translate(18.95%, 20.17%) !important;
+    z-index: 5 !important;
+}
+
+.anselma-template .orn-bank-2-1 {
+    position: absolute !important;
+    width: 51.85% !important;
+    right: 0 !important;
+    bottom: 33.3% !important;
+    transform: translate(0%, 0%) !important;
+    z-index: 3 !important;
+}
+
+.anselma-template .orn-bank-3 {
+    position: absolute !important;
+    width: 57.05% !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: translate(62.88%, -20.17%) !important;
+    z-index: 3 !important;
+}
+
+.anselma-template .orn-bank-4.right {
+    position: absolute !important;
+    width: 61.4% !important;
+    right: 0 !important;
+    top: 0 !important;
+    transform: translate(24%, -5%) scaleX(-1) !important;
+    z-index: 1 !important;
+}
+
+.anselma-template .orn-bank-4.left {
+    position: absolute !important;
+    width: 61.4% !important;
+    left: 0 !important;
+    top: 0 !important;
+    transform: translate(-24%, -5%) !important;
+    z-index: 1 !important;
+}
+
+.anselma-template .orn-bank-5 {
+    position: absolute !important;
+    width: 15% !important;
+    left: 0 !important;
+    top: 0 !important;
+    transform: translate(0%, -27%) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .orn-bank-6 {
+    position: absolute !important;
+    width: 15% !important;
+    right: 0 !important;
+    top: 0 !important;
+    transform: translate(20%, -34%) !important;
+    z-index: 6 !important;
+}
+
+@media (min-width: 561px) and (max-width: 961px) {
+    .anselma-template .orn-bank-3 {
+        width: 53.05% !important;
+        transform: translate(53.88%, -20.17%) !important;
+    }
+
+    .anselma-template .orn-bank-1-1-1 {
+        width: 67.77% !important;
+        left: 17.33% !important;
+        top: 0 !important;
+        transform: translate(0%, -33%) !important;
+    }
+
+    .anselma-template .orn-bank-4.left {
+        width: 60.4% !important;
+        transform: translate(-31%, -5%) !important;
+    }
+
+    .anselma-template .orn-bank-4.right {
+        width: 60.4% !important;
+        transform: translate(31%, -5%) scaleX(-1) !important;
+    }
+}
+
+/* =========================================================
+   KADO / SEND US A GIFT ORNAMENTS - ORIGINAL VALUES
+========================================================= */
+
+.anselma-template .gift-section-wrap {
+    position: relative !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    padding-top: 5% !important;
+    background: var(--background-primary) !important;
+}
+
+.anselma-template .gift-address-wrap {
+    position: relative !important;
+    width: 93.56% !important;
+    margin: 0 auto 12% !important;
+    overflow: visible !important;
+}
+
+.anselma-template .gift-address-wrap > .ornaments-wrapper,
+.anselma-template .gift-address-wrap .ornaments-wrapper {
+    position: absolute !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    overflow: visible !important;
+}
+
+.anselma-template .orn-qm-1.right {
+    position: absolute !important;
+    width: 41.36% !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    transform: translate(26.18%, 42.62%) !important;
+}
+
+.anselma-template .orn-qm-1.left {
+    position: absolute !important;
+    width: 41.36% !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    transform: translate(-26.18%, 42.62%) scaleX(-1) !important;
+}
+
+.anselma-template .orn-qm-2.right {
+    position: absolute !important;
+    width: 33.75% !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    transform: translate(43.82%, 0%) scaleX(-1) !important;
+}
+
+.anselma-template .orn-qm-2.left {
+    position: absolute !important;
+    width: 33.21% !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    transform: translate(-44.33%, 0%) scaleX(-1) !important;
+}
+
+.anselma-template .orn-qm-3.right {
+    position: absolute !important;
+    width: 13.43% !important;
+    bottom: 25% !important;
+    right: 0 !important;
+    transform: translate(62.79%, -14%) !important;
+}
+
+.anselma-template .orn-qm-3.left {
+    position: absolute !important;
+    width: 13.43% !important;
+    bottom: 25% !important;
+    left: 0 !important;
+    transform: translate(-62.79%, -14%) scaleX(-1) !important;
+}
+
+.anselma-template .orn-qm-4.right {
+    position: absolute !important;
+    width: 22.27% !important;
+    bottom: 34% !important;
+    right: 0 !important;
+    transform: translate(43.89%, -23%) !important;
+}
+
+.anselma-template .orn-qm-4.left {
+    position: absolute !important;
+    width: 22.27% !important;
+    bottom: 34% !important;
+    left: 0 !important;
+    transform: translate(-43.89%, -23%) scaleX(-1) !important;
+}
+
+.anselma-template .orn-qm-4-1 {
+    position: absolute !important;
+    width: 73.033% !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: translate(-19%, -31%) rotate(-24deg) !important;
+}
+
+.anselma-template .orn-qm-5 {
+    position: absolute !important;
+    width: 121.8% !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translate(-50%, -20%) !important;
+}
+
+.anselma-template .gift-address-wrap .ornaments-wrapper img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* =========================================
+   WEDDING GIFT - ACCORDION SPACING + TOGGLE
+========================================= */
+
+/* form wrapper jangan motong konten accordion */
+.anselma-template #weddingGiftForm {
+    overflow: visible !important;
+    align-items: flex-start !important;
+}
+
+/* slide tetap rapi */
+.anselma-template #weddingGiftForm .wedding-gift-slide {
+    overflow: visible !important;
+}
+
+/* jarak antar blok bank */
+.anselma-template .wedding-gift-bank-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* tiap bank accordion */
+.anselma-template .accor-bank-wrap {
+    width: 100%;
+    margin-bottom: 0 !important;
+}
+
+/* tombol accordion bank */
+.anselma-template .bank-btn-accordion {
+    width: 100%;
+    min-height: 56px;
+    border: none !important;
+    outline: none !important;
+    appearance: none;
+    box-shadow: none !important;
+    cursor: pointer;
+
+    background: var(--button-background-primary);
+    color: var(--button-text-primary);
+    border-radius: 18px;
+    padding: 16px 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+}
+
+/* frame detail bank default hidden */
+.anselma-template .wedding-gift-inner .gift-frame.bankItemAccordion {
+    display: none !important;
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+}
+
+/* aktif */
+.anselma-template .wedding-gift-inner .gift-frame.bankItemAccordion.active {
+    display: block !important;
+}
+
+/* wrapper aktif */
+.anselma-template .accor-bank-wrap.accor-active .gift-frame.bankItemAccordion {
+    display: block !important;
+}
+
+/* icon accordion bank */
+.anselma-template .bank-btn-accordion .ph-control,
+.anselma-template .bank-btn-accordion .bank-accordion-icon {
+    transition: transform 0.3s ease;
+}
+
+.anselma-template .accor-bank-wrap.accor-active .ph-control,
+.anselma-template .accor-bank-wrap.accor-active .bank-accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* beri jarak setelah kumpulan bank sebelum confirmation form */
+.anselma-template .slider-bank-wrap {
+    margin-top: 28px !important;
+    margin-bottom: 12px !important;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    cursor: pointer;
+}
+
+/* icon confirmation */
+.anselma-template .slider-bank-wrap svg {
+    transition: transform 0.3s ease;
+    transform: rotate(180deg);
+}
+
+.anselma-template .slider-bank-wrap.active svg {
+    transform: rotate(0deg);
+}
+
+.anselma-template .slider-bank-wrap p.sld-bank {
+    margin: 0;
+    color: var(--text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+}
+
+/* form confirmation default tertutup */
+.anselma-template .gift-form-sender-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+
+/* ketika dibuka */
+.anselma-template .gift-form-sender-wrapper.is-open {
+    max-height: 1200px;
+    opacity: 1;
+    margin-top: 8px;
+}
+
+/* label confirmation form */
+.anselma-template .wedding-gift-sender-data-wrap label {
+    margin-bottom: 16px !important;
+    text-align: left !important;
+}
+
+/* jarak antar input */
+.anselma-template .wedding-gift-sender-data-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.anselma-template .wedding-gift-sender-data-wrap .form-group {
+    margin: 0 !important;
+}
+
+/* input */
+.anselma-template .wedding-gift-sender-data-wrap .form-control {
+    width: 100% !important;
+    display: block;
+    box-sizing: border-box;
+    background-color: transparent;
+    border-radius: 18px;
+    border: 1px solid var(--button-background-primary);
+    padding: 14px 18px;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-secondary);
+}
+
+.anselma-template .wedding-gift-sender-data-wrap textarea.form-control {
+    min-height: 70px;
+    resize: vertical;
+}
+
+/* tombol next */
+.anselma-template .wedding-gift-page {
+    border-radius: 18px !important;
+    padding: 14px 20px !important;
+}
+
+/* mobile tune */
+@media (max-width: 560px) {
+    .anselma-template .wedding-gift-bank-wrap {
+        gap: 12px;
+    }
+
+    .anselma-template .slider-bank-wrap {
+        margin-top: 24px !important;
+    }
+
+    .anselma-template .bank-btn-accordion {
+        padding: 14px 20px;
+        border-radius: 16px;
+    }
+
+    .anselma-template .wedding-gift-sender-data-wrap .form-control {
+        border-radius: 16px;
+    }
+
+    .anselma-template .wedding-gift-page {
+        border-radius: 16px !important;
+    }
+}
+
+/* =========================================
+   WEDDING GIFT INTERACTION FIX
+========================================= */
+
+/* Tombol interaktif tetap bisa diklik walaupun punya data-aos */
+.anselma-template .bankBtnAccordion[data-aos],
+.anselma-template .slider-bank-wrap[data-aos],
+.anselma-template .gift-form-sender-wrapper[data-aos],
+.anselma-template .wedding-gift-page[data-aos] {
+    pointer-events: auto !important;
+}
+
+/* Jangan apply flex gap ke wrapper bank yang ada di dalam frame */
+.anselma-template .wedding-gift-details > .wedding-gift-bank-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+
+/* Accordion bank */
+.anselma-template .wedding-gift-inner .gift-frame.bankItemAccordion {
+    display: none !important;
+    margin-top: 12px !important;
+    margin-bottom: 8px !important;
+}
+
+.anselma-template .wedding-gift-inner .gift-frame.bankItemAccordion.active,
+.anselma-template .accor-bank-wrap.accor-active > .gift-frame.bankItemAccordion {
+    display: block !important;
+}
+
+/* Confirmation form default tertutup */
+.anselma-template .gift-form-sender-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+
+    max-height: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    margin-top: 0 !important;
+
+    transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.25s ease;
+}
+
+/* Confirmation form terbuka */
+.anselma-template .gift-form-sender-wrapper.is-open {
+    max-height: 1200px !important;
+    opacity: 1 !important;
+    margin-top: 10px !important;
+}
+
+/* Icon bank */
+.anselma-template .bank-accordion-icon {
+    display: inline-flex;
+    transition: transform 0.3s ease;
+}
+
+.anselma-template .accor-bank-wrap.accor-active .bank-accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* Icon confirmation */
+.anselma-template .slider-bank-icon {
+    display: inline-flex;
+    transition: transform 0.3s ease;
+}
+
+.anselma-template .slider-bank-wrap.active .slider-bank-icon {
+    transform: rotate(180deg);
+}
+
+/* Biar tombol terlihat clickable */
+.anselma-template .bankBtnAccordion,
+.anselma-template .slider-bank-wrap {
+    cursor: pointer !important;
+    user-select: none;
+}
+
+/* ==============================
+        WEDDING WISH - ORIGINAL KATSUDOTO STYLE
+============================== */
+
+.anselma-template .wedding-wish-wrap {
+    position: relative;
+    overflow: hidden;
+    padding: 5% 24px;
+    background: var(--background-primary);
+}
+
+.anselma-template .wedding-wish-inner {
+    position: relative;
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+/* Head */
+.anselma-template .wedding-wish-head {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 7%;
+}
+
+.anselma-template .wedding-wish-head .wedding-wish-title {
+    margin: 0;
+    color: var(--text-primary);
+    font-family: var(--heading-family);
+    font-size: var(--heading-size);
+    font-weight: var(--heading-weight);
+    line-height: 1;
+}
+
+.anselma-template .wedding-wish-head .wedding-wish-description {
+    line-height: 150%;
+}
+
+/* Body */
+.anselma-template .wedding-wish-body {
+    padding: 24px 0;
+}
+
+/* Form */
+.anselma-template .wedding-wish-form {
+    padding-bottom: 32px;
+}
+
+.anselma-template .wedding-wish-form .hide {
+    display: none;
+}
+
+.anselma-template .wedding-wish-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.anselma-template .wedding-wish-form .form-group {
+    margin: 0;
+}
+
+.anselma-template .wedding-wish-form .form-control {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+    border: 1px solid var(--background-secondary);
+    border-radius: 12px;
+    padding: 12px;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.anselma-template .wedding-wish-form .form-control::placeholder {
+    color: rgba(117, 117, 117, 0.50);
+}
+
+.anselma-template .wedding-wish-form .form-control:-ms-input-placeholder {
+    color: rgba(117, 117, 117, 0.50);
+}
+
+.anselma-template .wedding-wish-form .form-control::-ms-input-placeholder {
+    color: rgba(117, 117, 117, 0.50);
+}
+
+.anselma-template .wedding-wish-form .form-control:focus {
+    border: 1px solid var(--text-primary);
+    box-shadow: none;
+    outline: none;
+}
+
+.anselma-template .wedding-wish-form textarea.form-control {
+    min-height: 40px;
+    max-height: 250px;
+    resize: vertical;
+}
+
+.anselma-template .wedding-wish-form .submit-comment {
+    padding: 12px 24px;
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    outline: none;
+    background-color: rgba(var(--button-background-primary-rgb), 1);
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: 400;
+    line-height: 150%;
+    transition: all 0.25s ease-in-out;
+}
+
+.anselma-template .wedding-wish-form .submit-comment:hover {
+    background-color: rgba(var(--button-background-primary-rgb), 1);
+    color: var(--button-text-primary);
+}
+
+/* Comment Box */
+.anselma-template .comment-box-wrap {
+    position: relative;
+}
+
+.anselma-template .comment-box-wrap .form-group {
+    margin-bottom: 0;
+}
+
+.anselma-template .comment-box-wrap textarea.form-control {
+    height: auto;
+    min-height: 0;
+}
+
+.anselma-template .comment-box-wrap .submit-comment-wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.anselma-template .wedding-wish-form form .submit-comment-wrap {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Comment Wrap */
+.anselma-template .comment-wrap {
+    display: none;
+}
+
+.anselma-template .comment-wrap.show {
+    display: block;
+}
+
+.anselma-template .comment-item {
+    padding: 16px;
+    background: var(--background-tertiary);
+    margin-bottom: 24px;
+    border-radius: 12px;
+}
+
+.anselma-template .comment-item:last-of-type {
+    margin-bottom: 0;
+}
+
+.anselma-template .comment-head {
+    position: relative;
+    margin-bottom: 4px;
+}
+
+.anselma-template .comment-head .comment-name {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: 400;
+    line-height: 150%;
+    color: var(--text-primary);
+}
+
+.anselma-template .comment-head .comment-name > i {
+    font-size: 0.7em;
+}
+
+.anselma-template .comment-head .comment-date {
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    line-height: 150%;
+    display: block;
+    margin-top: 4px;
+    color: var(--text-secondary);
+}
+
+.anselma-template .comment-head .delete-comment {
+    position: absolute;
+    top: 0;
+    right: 0;
+    text-decoration: none;
+    display: inline-block;
+    vertical-align: top;
+    color: rgba(153, 20, 50, 1);
+    transition: color 0.25s ease-in-out;
+}
+
+.anselma-template .comment-head .delete-comment:hover {
+    color: rgba(153, 20, 50, 0.8);
+}
+
+.anselma-template .comment-body .comment-caption {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    line-height: 150%;
+    color: var(--text-secondary);
+}
+
+/* More Comment */
+.anselma-template .more-comment-wrap {
+    padding: 24px 0 0;
+    display: none;
+    text-align: center;
+}
+
+.anselma-template .more-comment-wrap.show {
+    display: block;
+}
+
+.anselma-template #moreComment {
+    border: none;
+    outline: none;
+    width: 100%;
+    display: block;
+    padding: 12px 16px;
+    margin: 0 auto;
+    border-radius: 12px;
+    text-decoration: none;
+    background-color: var(--button-background-primary);
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: 400;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+}
+
+.anselma-template #moreComment:hover {
+    background-color: rgba(var(--button-background-hover-rgb), 1);
+    color: var(--button-text-hover);
+}
+
+.anselma-template section.notes-container {
+    padding: 20% 0;
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .anselma-template .wedding-wish-wrap {
+        padding: 7% 24px;
+    }
+}
+
+/* ==============================
+        QUOTE MESSAGE / CLOSING
+============================== */
+
+.anselma-template .quote-message-wrap {
+    overflow: hidden;
+    position: relative;
+    padding: 10% 19px 9%;
+    background: var(--background-primary);
+}
+
+.anselma-template .quote-message-wrap::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(
+        180deg,
+        rgba(245, 242, 228, 0.00) 0%,
+        rgba(245, 242, 228, 0.00) 50%,
+        #F5F2E4 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+.anselma-template .quote-message-wrap .quote-message {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.anselma-template .quote-message-wrap .quote-message-inner-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 16px;
+    background: var(--background-secondary);
+    border-radius: 500px 500px 0 0;
+}
+
+.anselma-template .quote-message-wrap .quote-message .quote-message-inner {
+    display: flex;
+    padding: 19.6% 14% 14%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex: 1 0 0;
+    background: var(--background-primary);
+    border-radius: 500px 500px 0 0;
+    border: 2px solid var(--text-secondary);
+    text-align: center;
+    position: relative;
+    z-index: 5;
+}
+
+.anselma-template .quote-message-wrap .orn-agenda-top {
+    width: clamp(120px, 36%, 180px);
+    margin: 0 auto;
+}
+
+.anselma-template .quote-message-wrap .orn-agenda-top img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.anselma-template .quote-message-wrap .quote-message-title {
+    margin: 0;
+    font-family: var(--heading-family);
+    font-size: calc(var(--heading-size));
+    font-weight: var(--heading-weight);
+    line-height: 1;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.anselma-template .quote-message-wrap .quote-message-desc {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+    line-height: 150%;
+    text-transform: none;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* Ornament wrapper */
+.anselma-template .quote-message-wrap .quote-message-ornaments {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    overflow: visible;
+}
+
+.anselma-template .quote-message-wrap .quote-message-ornaments img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ==============================
+   QUOTE MESSAGE ORNAMENTS
+   Scoped agar tidak bentrok dengan gift/kado
+============================== */
+
+.anselma-template .quote-message-wrap .orn-qm-1.right {
+    position: absolute;
+    width: 41.36%;
+    bottom: 0;
+    right: 0;
+    transform: translate(26.18%, 42.62%);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-1.left {
+    position: absolute;
+    width: 41.36%;
+    bottom: 0;
+    left: 0;
+    transform: translate(-26.18%, 42.62%) scaleX(-1);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-2.right {
+    position: absolute;
+    width: 33.75%;
+    bottom: 0;
+    right: 0;
+    transform: translate(43.82%, 0%) scaleX(-1);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-2.left {
+    position: absolute;
+    width: 33.21%;
+    bottom: 0;
+    left: 0;
+    transform: translate(-44.33%, 0%) scaleX(-1);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-3.right {
+    position: absolute;
+    width: 13.43%;
+    bottom: 25%;
+    right: 0;
+    transform: translate(62.79%, -14%);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-3.left {
+    position: absolute;
+    width: 13.43%;
+    bottom: 25%;
+    left: 0;
+    transform: translate(-62.79%, -14%) scaleX(-1);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-4.right {
+    position: absolute;
+    width: 22.27%;
+    bottom: 34%;
+    right: 0;
+    transform: translate(43.89%, -23%);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-4.left {
+    position: absolute;
+    width: 22.27%;
+    bottom: 34%;
+    left: 0;
+    transform: translate(-43.89%, -23%) scaleX(-1);
+    z-index: 4;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-4-1 {
+    position: absolute;
+    width: 73.033%;
+    top: 0;
+    left: 0;
+    transform: translate(-19%, -31%) rotate(-24deg);
+    z-index: 2;
+}
+
+/* supaya konten tetap di depan ornament */
+.anselma-template .quote-message-wrap .zin-3 {
+    position: relative;
+    z-index: 6;
+}
+
+/* desktop/tablet */
+@media (min-width: 700px) {
+    .anselma-template .quote-message-wrap .quote-message .quote-message-inner {
+        padding-top: 30%;
+    }
+}
+
+/* mobile */
+@media (max-width: 560px) {
+    .anselma-template .quote-message-wrap {
+        padding: 12% 19px 10%;
+    }
+
+    .anselma-template .quote-message-wrap .quote-message-inner-wrap {
+        padding: 14px;
+    }
+
+    .anselma-template .quote-message-wrap .quote-message .quote-message-inner {
+        padding: 22% 13% 16%;
+        gap: 20px;
+    }
+}
+
+/* =========================================================
+   QUOTE MESSAGE ORNAMENT LAYER FIX
+   Make flowers/wayang appear outside the inner panel
+========================================================= */
+
+/* Jangan potong ornamen yang keluar dari frame */
+.anselma-template .quote-message-wrap .quote-message-inner-wrap {
+    overflow: visible !important;
+}
+
+/* Panel utama tetap jadi background, tapi jangan menutup ornamen */
+.anselma-template .quote-message-wrap .quote-message .quote-message-inner {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Ornament harus berada di atas panel */
+.anselma-template .quote-message-wrap .quote-message-ornaments {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+    overflow: visible !important;
+}
+
+/* Konten teks tetap paling atas */
+.anselma-template .quote-message-wrap .quote-message-inner .orn-agenda-top,
+.anselma-template .quote-message-wrap .quote-message-title,
+.anselma-template .quote-message-wrap .quote-message-desc,
+.anselma-template .quote-message-wrap .zin-3 {
+    position: relative !important;
+    z-index: 8 !important;
+}
+
+/* Perbesar dan dorong ornament bawah supaya keluar seperti Katsudoto */
+.anselma-template .quote-message-wrap .orn-qm-1.right {
+    width: 46% !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: translate(18%, 30%) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-1.left {
+    width: 46% !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    transform: translate(-18%, 30%) scaleX(-1) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-2.right {
+    width: 38% !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: translate(32%, 0%) scaleX(-1) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-2.left {
+    width: 38% !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    transform: translate(-32%, 0%) scaleX(-1) !important;
+    z-index: 6 !important;
+}
+
+/* Ornament samping/wayang dibuat lebih masuk ke area panel */
+.anselma-template .quote-message-wrap .orn-qm-3.right {
+    width: 17% !important;
+    right: 0 !important;
+    bottom: 30% !important;
+    transform: translate(28%, 0%) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-3.left {
+    width: 17% !important;
+    left: 0 !important;
+    bottom: 30% !important;
+    transform: translate(-28%, 0%) scaleX(-1) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-4.right {
+    width: 28% !important;
+    right: 0 !important;
+    bottom: 36% !important;
+    transform: translate(20%, 0%) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-4.left {
+    width: 28% !important;
+    left: 0 !important;
+    bottom: 36% !important;
+    transform: translate(-20%, 0%) scaleX(-1) !important;
+    z-index: 6 !important;
+}
+
+.anselma-template .quote-message-wrap .orn-qm-4-1 {
+    width: 72% !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: translate(-18%, -31%) rotate(-24deg) !important;
+    z-index: 5 !important;
+}
+
+/* =========================================================
+   SECTION 1 / PRIMARY PANE DESKTOP FIX
+   Match Katsudoto desktop left pane
+========================================================= */
+
+.anselma-template .kat-page__side-to-side {
+    min-height: 480px;
+    display: block;
+    position: relative;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+/* left desktop pane */
+.anselma-template .kat-page__side-to-side .primary-pane {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 61% !important;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--background-primary);
+    z-index: 1;
+}
+
+/* right scroll pane */
+.anselma-template .kat-page__side-to-side .secondary-pane {
+    position: relative !important;
+    width: 39% !important;
+    margin-left: auto !important;
+    background-color: var(--background-primary);
+    z-index: 2;
+}
+
+/* primary video background */
+.anselma-template .primary-pane .bg-orn-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* fallback kalau video belum load */
+.anselma-template .primary-pane::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/templates/anselma/files/bg-cover.png");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.75;
+    z-index: 0;
+}
+
+/* soft cream center overlay like Katsudoto */
+.anselma-template .kat-page__side-to-side .primary-pane .inner {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    padding: 7% 6%;
+
+    background: radial-gradient(
+        50% 50% at 50% 50%,
+        var(--background-primary) 0%,
+        rgba(250, 244, 244, 0.00) 100%
+    );
+}
+
+.anselma-template .kat-page__side-to-side .primary-pane .inner .primary-pane-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column-reverse;
+    gap: 28px;
+
+    background: radial-gradient(
+        50% 50% at 50% 50%,
+        var(--background-primary) 0%,
+        rgba(245, 242, 228, 0.75) 50%,
+        rgba(245, 242, 228, 0.00) 100%
+    );
+}
+
+/* text content */
+.anselma-template .primary-pane-details {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.anselma-template .primary-pane-details--content {
+    position: relative;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+
+    text-align: center;
+}
+
+.anselma-template .primary-pane-details--content .primary-pane-title {
+    width: 100%;
+    margin: 0;
+    padding: 0 0.4em;
+
+    font-family: var(--heading-family);
+    font-size: calc(var(--heading-size) + 8px);
+    font-weight: var(--heading-weight);
+    line-height: 1;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.anselma-template .primary-pane .primary-pane-details--content .link-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+}
+
+.anselma-template .primary-pane .primary-pane-details--content .link-wrap .greeting-text {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    font-weight: var(--body-text-weight);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* mobile: only show secondary cover */
+@media only screen and (max-width: 960px) {
+    .anselma-template .kat-page__side-to-side .primary-pane {
+        position: relative !important;
+        width: 100% !important;
+        display: none !important;
+    }
+
+    .anselma-template .kat-page__side-to-side .secondary-pane {
+        position: relative !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
+
+
+/* =========================================================
+   AUTO DISABLED OLD COVER/COUPLE CSS
+   Disabled by terminal script. Backup file was created.
+=========================================================
+/* =========================================================
+   SECTION 2 / COUPLE SPACING FIX
+   Match Katsudoto couple section vertical layout
+========================================================= * /
+
+/* Jangan center section secara vertikal * /
+.anselma-template .couple-wrap,
+.anselma-template section.couple-wrap,
+.anselma-template .couple-section,
+.anselma-template section.couple-section {
+    position: relative !important;
+    min-height: auto !important;
+    height: auto !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: block !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    background: var(--background-primary) !important;
+}
+
+/* Inner jangan ikut center full viewport * /
+.anselma-template .couple-wrap .inner,
+.anselma-template .couple-section .inner,
+.anselma-template .couple-inner {
+    min-height: auto !important;
+    height: auto !important;
+    padding-top: 6% !important;
+    padding-bottom: 0 !important;
+    display: block !important;
+}
+
+/* Area teks lebih dekat ke atas * /
+.anselma-template .couple-head,
+.anselma-template .couple-content,
+.anselma-template .couple-description,
+.anselma-template .couple-message {
+    position: relative !important;
+    margin-top: 0 !important;
+}
+
+/* Judul couple * /
+.anselma-template .couple-wrap h1,
+.anselma-template .couple-section h1,
+.anselma-template .couple-title {
+    margin-top: 0 !important;
+    margin-bottom: 22px !important;
+    line-height: 1.15 !important;
+}
+
+/* Paragraf dibuat seperti Katsudoto, tidak terlalu turun * /
+.anselma-template .couple-wrap p,
+.anselma-template .couple-section p,
+.anselma-template .couple-caption,
+.anselma-template .couple-description p {
+    margin-top: 0 !important;
+    line-height: 1.55 !important;
+}
+
+/* Divider dan nama groom/bride * /
+.anselma-template .couple-divider,
+.anselma-template .couple-separator,
+.anselma-template .couple-name-wrap {
+    margin-top: 8% !important;
+}
+
+========================================================= */
+
+/* Frame foto pasangan jangan terlalu jauh dari nama */
+.anselma-template .couple-preview,
+.anselma-template .couple-photo-wrap,
+.anselma-template .couple-frame-wrap {
+    margin-top: 6% !important;
+}
+
+
+/* =========================================================
+   AUTO DISABLED OLD COVER/COUPLE CSS
+   Disabled by terminal script. Backup file was created.
+=========================================================
+/* =========================================================
+   SECTION 2 / COUPLE MOBILE TUNING
+========================================================= * /
+
+@media (max-width: 560px) {
+    .anselma-template .couple-wrap,
+    .anselma-template section.couple-wrap,
+    .anselma-template .couple-section,
+    .anselma-template section.couple-section {
+        padding-top: 0 !important;
+    }
+
+    .anselma-template .couple-wrap .inner,
+    .anselma-template .couple-section .inner,
+    .anselma-template .couple-inner {
+        padding-top: 5% !important;
+    }
+
+    .anselma-template .couple-wrap h1,
+    .anselma-template .couple-section h1,
+    .anselma-template .couple-title {
+        margin-bottom: 18px !important;
+    }
+
+    .anselma-template .couple-divider,
+    .anselma-template .couple-separator,
+    .anselma-template .couple-name-wrap {
+        margin-top: 12% !important;
+    }
+
+    .anselma-template .couple-preview,
+    .anselma-template .couple-photo-wrap,
+    .anselma-template .couple-frame-wrap {
+        margin-top: 7% !important;
+    }
+}
+
+========================================================= */
+
+
+/* =========================================================
+   AUTO DISABLED OLD COVER/COUPLE CSS
+   Disabled by terminal script. Backup file was created.
+=========================================================
+/* =========================================================
+   FIX GAP AFTER COVER / BEFORE COUPLE
+   Remove leftover spacing from section 1
+========================================================= * /
+
+/* Cover tetap 1 viewport, tapi padding tidak menambah tinggi asli * /
+.anselma-template .secondary-pane section.cover.anselma-original-cover,
+.anselma-template .secondary-pane section.cover.anselma-original-cover .inner {
+    box-sizing: border-box !important;
+}
+
+/* Hilangkan extra spacing bawah dari patch lama * /
+.anselma-template .secondary-pane section.cover.anselma-original-cover .inner {
+    padding-bottom: 0 !important;
+}
+
+.anselma-template .secondary-pane section.cover.anselma-original-cover .inner .body.highlight {
+    margin-bottom: 0 !important;
+}
+
+/* Pastikan section couple tidak kena padding global section-block * /
+.anselma-template .secondary-pane > .couple-wrap,
+.anselma-template .secondary-pane > section.couple-wrap,
+.anselma-template .secondary-pane > .couple-wrap.section-block,
+.anselma-template .secondary-pane > section.couple-wrap.section-block {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+/* Kembalikan spacing couple mengikuti Katsudoto, tapi sedikit lebih compact * /
+.anselma-template .secondary-pane > .couple-wrap .couple {
+    padding: 6% 0 5% !important;
+}
+
+.anselma-template .secondary-pane > .couple-wrap .couple-head {
+    padding: 0 10.3% 7% !important;
+    margin: 0 auto !important;
+}
+
+/* Mobile tuning * /
+@media (max-width: 560px) {
+    .anselma-template .secondary-pane section.cover.anselma-original-cover .inner {
+        padding-bottom: 0 !important;
+    }
+
+    .anselma-template .secondary-pane section.cover.anselma-original-cover .inner .body.highlight {
+        margin-bottom: 0 !important;
+    }
+
+    .anselma-template .secondary-pane > .couple-wrap .couple {
+        padding-top: 4% !important;
+    }
+
+    .anselma-template .secondary-pane > .couple-wrap .couple-head {
+        padding-top: 0 !important;
+    }
+}
+
+========================================================= */
+
+
+/* =========================================================
+   AUTO DISABLED OLD COVER/COUPLE CSS
+   Disabled by terminal script. Backup file was created.
+=========================================================
+
+/* =========================================================
+   MINIMAL SAFE FIX: COVER + COUPLE
+   Jangan bongkar frame. Hanya netralkan 100vh bridge.
+========================================================= */
+
+/* Bridge awal kamu memaksa cover 100vh. Ini bikin jarak besar.
+   Kita kembalikan ke flow original Katsudoto. */
+body.anselma-template .secondary-pane section.cover.anselma-original-cover {
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 5% !important;
+    margin-bottom: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* Inner juga jangan 100vh. Biarkan tinggi mengikuti isi. */
+body.anselma-template .secondary-pane section.cover.anselma-original-cover .inner {
+    height: auto !important;
+    min-height: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    padding-top: 5% !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}
+
+/* Kembalikan spacing foto seperti Katsudoto original */
+body.anselma-template .secondary-pane section.cover.anselma-original-cover .inner .body,
+body.anselma-template .secondary-pane section.cover.anselma-original-cover .inner .body.highlight {
+    margin: 24px auto 48px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+/* Jangan ubah struktur cover-frame dan cover-picture.
+   Biarkan CSS original Katsudoto yang mengatur mask/frame. */
+body.anselma-template .secondary-pane section.cover.anselma-original-cover .orn-cover-frame {
+    overflow: visible !important;
+}
+
+/* Mask cukup jadi fade bawah, jangan menutup foto terlalu besar */
+body.anselma-template .secondary-pane section.cover.anselma-original-cover .cover-mask {
+    height: 30% !important;
+    bottom: 0 !important;
+    top: auto !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+}
+
+/* Couple mulai normal setelah cover, tidak naik menabrak cover */
+body.anselma-template .secondary-pane section.cover.anselma-original-cover + .couple-wrap {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Couple pakai spacing original */
+body.anselma-template .secondary-pane .couple-wrap .couple {
+    padding: 10% 0 5% !important;
+}
+
+body.anselma-template .secondary-pane .couple-head {
+    padding: 0 10.3% 7% !important;
+    margin: auto !important;
+}
+
+/* Mobile tuning ringan */
+@media (max-width: 560px) {
+    body.anselma-template .secondary-pane section.cover.anselma-original-cover .inner .body,
+    body.anselma-template .secondary-pane section.cover.anselma-original-cover .inner .body.highlight {
+        margin: 24px auto 48px !important;
+    }
+}
+
+

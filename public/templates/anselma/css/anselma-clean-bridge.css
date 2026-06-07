@@ -1,0 +1,535 @@
+/* =========================================================
+   ANSELMA CLEAN BRIDGE
+   Only variables, Laravel asset paths, and safe guards
+========================================================= */
+
+body.anselma-template {
+    --background-primary: #F5F2E4;
+    --background-primary-rgb: 245, 242, 228;
+
+    --background-secondary: #700F06;
+    --background-secondary-rgb: 112, 15, 6;
+
+    --background-tertiary: #FFFFFF;
+    --background-tertiary-rgb: 255, 255, 255;
+
+    --text-primary: #700F06;
+    --text-primary-rgb: 112, 15, 6;
+
+    --text-secondary: #8A643C;
+    --text-secondary-rgb: 138, 100, 60;
+
+    --text-tertiary: #E8E1D1;
+    --text-tertiary-rgb: 232, 225, 209;
+
+    --button-text-primary: #E8E1D1;
+    --button-text-primary-rgb: 232, 225, 209;
+
+    --button-background-primary: #700F06;
+    --button-background-primary-rgb: 112, 15, 6;
+
+    --button-text-secondary: #700F06;
+    --button-text-secondary-rgb: 112, 15, 6;
+
+    --button-background-secondary: #F5F2E4;
+    --button-background-secondary-rgb: 245, 242, 228;
+
+    --heading-family: "Pinyon Script", cursive;
+    --heading-style: normal;
+    --heading-weight: 400;
+    --heading-size: 52px;
+    --heading-lettercase: none;
+
+    --body-text-family: "Lancelot", serif;
+    --body-text-style: normal;
+    --body-text-weight: 400;
+    --body-text-size: 18px;
+    --body-text-lettercase: none;
+
+    --fs-extra-1: 2px;
+    --fs-extra-2: 4px;
+    --fs-extra-3: 5px;
+    --fs-extra-4: 6px;
+    --fs-extra-5: 10px;
+    --fs-extra-6: 12px;
+    --fs-extra-7: 15px;
+    --fs-extra-8: 20px;
+
+    --texture-1: url("/templates/anselma/files/texture-1.png");
+    --frame-cover-mask: url("/templates/anselma/files/mask-cover.png");
+    --mask-couple: url("/templates/anselma/files/frame-couple.png");
+
+    --secondary-clr: #E6E0CF;
+    --light-clr: #F5F2E4;
+    --dark-clr: #111827;
+    --roboto: Arial, sans-serif;
+}
+
+/* Global safe guard */
+.anselma-template * {
+    box-sizing: border-box;
+}
+
+.anselma-template img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* AOS guard */
+.anselma-template [data-aos] {
+    pointer-events: none;
+}
+
+.anselma-template [data-aos].aos-animate {
+    pointer-events: auto;
+}
+
+/* Side to side layout */
+.anselma-template .kat-page__side-to-side {
+    min-height: 480px;
+    display: block;
+    position: relative;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.anselma-template .kat-page__side-to-side .primary-pane {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 61%;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--background-primary);
+    z-index: 1;
+}
+
+.anselma-template .kat-page__side-to-side .secondary-pane {
+    position: relative;
+    width: 39%;
+    margin-left: auto;
+    background: var(--background-primary);
+    z-index: 2;
+}
+
+@media only screen and (max-width: 960px) {
+    .anselma-template .kat-page__side-to-side .primary-pane {
+        display: none;
+    }
+
+    .anselma-template .kat-page__side-to-side .secondary-pane {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+/* Mobile font tuning */
+@media (max-width: 960px) {
+    body.anselma-template {
+        --heading-size: 58px;
+        --body-text-size: 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    body.anselma-template {
+        --heading-size: 44px;
+        --body-text-size: 16px;
+    }
+}
+
+/* =========================================================
+   OPENING GATE + LOADER
+========================================================= */
+
+body.anselma-template.is-gate-locked {
+    height: 100dvh !important;
+    overflow: hidden !important;
+}
+
+/* Loading */
+.anselma-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: grid;
+    place-items: center;
+    background: var(--background-primary);
+    color: var(--text-primary);
+    transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.anselma-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.anselma-loader-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.loader-mark {
+    width: 82px;
+    height: 82px;
+    border-radius: 999px;
+    border: 1px solid rgba(var(--text-primary-rgb), 0.28);
+    display: grid;
+    place-items: center;
+    font-family: var(--heading-family);
+    font-size: 30px;
+    line-height: 1;
+    color: var(--text-primary);
+    background: rgba(var(--background-primary-rgb), 0.72);
+}
+
+.loader-text {
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-secondary);
+}
+
+/* Opening gate */
+.opening-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--background-primary);
+    transition: opacity 0.65s ease, visibility 0.65s ease;
+}
+
+.opening-gate.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.opening-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+}
+
+.opening-video-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+        radial-gradient(
+            50% 45% at 50% 50%,
+            rgba(245, 242, 228, 0.92) 0%,
+            rgba(245, 242, 228, 0.72) 45%,
+            rgba(245, 242, 228, 0.22) 100%
+        );
+}
+
+.opening-video-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    padding: 9% 8% 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12%;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.opening-video-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.opening-video-subtitle {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: calc(var(--body-text-size) - 2px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.opening-video-title {
+    margin: 0;
+    font-family: var(--heading-family);
+    font-size: clamp(54px, 10vw, 96px);
+    font-weight: var(--heading-weight);
+    line-height: 0.95;
+    color: var(--text-primary);
+}
+
+.opening-video-title small {
+    display: inline-block;
+    margin: 0 0.12em;
+    font-size: 0.55em;
+    font-weight: 400;
+}
+
+.opening-video-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.opening-video-guest {
+    margin: 0;
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    color: var(--text-primary);
+}
+
+.opening-video-button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    min-width: 190px;
+    padding: 12px 24px;
+    border-radius: 999px;
+    background: var(--button-background-primary);
+    color: var(--button-text-primary);
+    font-family: var(--body-text-family);
+    font-size: var(--body-text-size);
+    line-height: 1.4;
+    box-shadow: 0 14px 35px rgba(var(--button-background-primary-rgb), 0.22);
+}
+
+.opening-video-button:hover {
+    background: rgba(var(--button-background-primary-rgb), 0.88);
+}
+
+/* Mobile tuning */
+@media (max-width: 560px) {
+    .opening-video-content {
+        padding: 16% 8% 14%;
+        gap: 16%;
+    }
+
+    .opening-video-title {
+        font-size: clamp(52px, 18vw, 78px);
+    }
+
+    .opening-video-subtitle {
+        font-size: 13px;
+    }
+
+    .opening-video-button {
+        min-width: 180px;
+        padding: 11px 22px;
+    }
+}
+
+/* Music original Katsudoto */
+body.anselma-template .music-outer {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 9999;
+}
+
+body.anselma-template .music-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    background: var(--button-background-primary);
+    color: var(--button-text-primary);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+body.anselma-template .music-box::before {
+    content: "♪";
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    line-height: 1;
+}
+
+body.anselma-template .music-box.playing {
+    animation: anselmaMusicPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes anselmaMusicPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+/* =========================================================
+   RSVP FORM RESTORE TO KATSUDOTO LOOK
+========================================================= */
+
+.anselma-template .rsvp-wrap.anselma-rsvp-original .is-hidden {
+    display: none !important;
+}
+
+/* Pastikan form ada di atas ornament */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-form-wrapper {
+    position: relative;
+    z-index: 3;
+}
+
+/* Pastikan isi form di atas background merah */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-form-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Hide native checkbox/radio */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-status-wrap input[name="rsvp_status"],
+.anselma-template .rsvp-wrap.anselma-rsvp-original .session-btn-wrap input[type="checkbox"] {
+    display: none;
+}
+
+/* Check mark */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .check-rsvp {
+    display: none;
+    margin-left: 8px;
+}
+
+.anselma-template .rsvp-wrap.anselma-rsvp-original input[name="rsvp_status"]:checked + .rsvp-confirm-btn .check-rsvp,
+.anselma-template .rsvp-wrap.anselma-rsvp-original .session-btn-wrap input[type="checkbox"]:checked + .rsvp-session-btn .check-rsvp {
+    display: inline-flex;
+}
+
+/* Fallback kalau icon plus/minus bukan SVG */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .toggle-text {
+    display: inline-block;
+    font-family: var(--body-text-family);
+    font-size: 26px;
+    line-height: 1;
+}
+
+/* Amount input */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-amount-controller .input-control {
+    text-align: center;
+}
+
+/* Disable hidden native number spinner */
+.anselma-template .rsvp-wrap.anselma-rsvp-original input[type="number"]::-webkit-inner-spin-button,
+.anselma-template .rsvp-wrap.anselma-rsvp-original input[type="number"]::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+/* Tombol submit full dan rapi */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-confirm-btn.confirm {
+    width: 100%;
+}
+
+/* Kalau status tidak hadir, event dan jumlah tamu disembunyikan */
+.anselma-template .rsvp-wrap.anselma-rsvp-original.is-not-attending #rsvpSessionField,
+.anselma-template .rsvp-wrap.anselma-rsvp-original.is-not-attending #rsvpTotalField {
+    display: none !important;
+}
+
+/* =========================================================
+   RSVP INTERACTION FIX
+========================================================= */
+
+/* Saat Tidak Hadir, pilihan acara dan jumlah tamu hilang */
+.anselma-template .rsvp-wrap.anselma-rsvp-original.is-not-attending #rsvpSessionField,
+.anselma-template .rsvp-wrap.anselma-rsvp-original.is-not-attending #rsvpTotalField,
+.anselma-template .rsvp-wrap.anselma-rsvp-original #rsvpSessionField.is-hidden,
+.anselma-template .rsvp-wrap.anselma-rsvp-original #rsvpTotalField.is-hidden {
+    display: none !important;
+}
+
+/* Checked state RSVP status */
+.anselma-template .rsvp-wrap.anselma-rsvp-original input[name="rsvp_status"]:checked + .rsvp-confirm-btn.going,
+.anselma-template .rsvp-wrap.anselma-rsvp-original input[name="rsvp_status"]:checked + .rsvp-confirm-btn.not-going {
+    background-color: var(--button-background-secondary) !important;
+    color: var(--button-text-secondary) !important;
+}
+
+/* Unchecked state RSVP status */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-confirm-btn.going,
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-confirm-btn.not-going {
+    background-color: transparent;
+    border: 1px solid var(--button-background-secondary);
+    color: var(--button-background-secondary);
+}
+
+/* Checked state pilihan acara */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .session-btn-wrap input[name="selected_event[]"]:checked + .rsvp-session-btn,
+.anselma-template .rsvp-wrap.anselma-rsvp-original .session-btn-wrap input[name="selected_event_all"]:checked + .rsvp-session-btn {
+    background-color: var(--button-background-secondary) !important;
+    color: var(--button-text-secondary) !important;
+}
+
+/* Unchecked pilihan acara */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-session-btn {
+    background-color: transparent;
+    border: 1px solid var(--button-background-secondary);
+    color: var(--button-background-secondary);
+}
+
+/* Tombol plus minus lebih responsif */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-amount-controller .toggle-btn {
+    transition:
+        transform 0.15s ease,
+        background-color 0.15s ease,
+        color 0.15s ease,
+        opacity 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Efek saat disentuh / diklik */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-amount-controller .toggle-btn:active,
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-amount-controller .toggle-btn.is-pressed {
+    transform: scale(0.94);
+    background-color: var(--button-background-primary) !important;
+    color: var(--button-text-primary) !important;
+    border: 1px solid var(--button-background-secondary) !important;
+}
+
+/* State disabled untuk min/max */
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-amount-controller .toggle-btn.is-disabled,
+.anselma-template .rsvp-wrap.anselma-rsvp-original .rsvp-amount-controller .toggle-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.anselma-template .live-streaming .play-icon-fallback {
+    display: none;
+}
+
+.anselma-template .wedding-gift-wrap .bank-btn-accordion {
+    cursor: pointer;
+}
+
+.anselma-template .wedding-gift-wrap .bank-accordion-icon {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #fff;
+    margin-left: auto;
+}
+
+

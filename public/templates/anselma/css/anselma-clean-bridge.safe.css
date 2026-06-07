@@ -1,0 +1,140 @@
+/* =========================================================
+   ANSELMA CLEAN BRIDGE
+   Only variables, Laravel asset paths, and safe guards
+========================================================= */
+
+body.anselma-template {
+    --background-primary: #F5F2E4;
+    --background-primary-rgb: 245, 242, 228;
+
+    --background-secondary: #700F06;
+    --background-secondary-rgb: 112, 15, 6;
+
+    --background-tertiary: #FFFFFF;
+    --background-tertiary-rgb: 255, 255, 255;
+
+    --text-primary: #700F06;
+    --text-primary-rgb: 112, 15, 6;
+
+    --text-secondary: #8A643C;
+    --text-secondary-rgb: 138, 100, 60;
+
+    --text-tertiary: #E8E1D1;
+    --text-tertiary-rgb: 232, 225, 209;
+
+    --button-text-primary: #E8E1D1;
+    --button-text-primary-rgb: 232, 225, 209;
+
+    --button-background-primary: #700F06;
+    --button-background-primary-rgb: 112, 15, 6;
+
+    --button-text-secondary: #700F06;
+    --button-text-secondary-rgb: 112, 15, 6;
+
+    --button-background-secondary: #F5F2E4;
+    --button-background-secondary-rgb: 245, 242, 228;
+
+    --heading-family: "Pinyon Script", cursive;
+    --heading-style: normal;
+    --heading-weight: 400;
+    --heading-size: 52px;
+    --heading-lettercase: none;
+
+    --body-text-family: "Lancelot", serif;
+    --body-text-style: normal;
+    --body-text-weight: 400;
+    --body-text-size: 18px;
+    --body-text-lettercase: none;
+
+    --fs-extra-1: 2px;
+    --fs-extra-2: 4px;
+    --fs-extra-3: 5px;
+    --fs-extra-4: 6px;
+    --fs-extra-5: 10px;
+    --fs-extra-6: 12px;
+    --fs-extra-7: 15px;
+    --fs-extra-8: 20px;
+
+    --texture-1: url("/templates/anselma/files/texture-1.png");
+    --frame-cover-mask: url("/templates/anselma/files/mask-cover.png");
+    --mask-couple: url("/templates/anselma/files/frame-couple.png");
+
+    --secondary-clr: #E6E0CF;
+    --light-clr: #F5F2E4;
+    --dark-clr: #111827;
+    --roboto: Arial, sans-serif;
+}
+
+/* Global safe guard */
+.anselma-template * {
+    box-sizing: border-box;
+}
+
+.anselma-template img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* AOS guard */
+.anselma-template [data-aos] {
+    pointer-events: none;
+}
+
+.anselma-template [data-aos].aos-animate {
+    pointer-events: auto;
+}
+
+/* Side to side layout */
+.anselma-template .kat-page__side-to-side {
+    min-height: 480px;
+    display: block;
+    position: relative;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.anselma-template .kat-page__side-to-side .primary-pane {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 61%;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--background-primary);
+    z-index: 1;
+}
+
+.anselma-template .kat-page__side-to-side .secondary-pane {
+    position: relative;
+    width: 39%;
+    margin-left: auto;
+    background: var(--background-primary);
+    z-index: 2;
+}
+
+@media only screen and (max-width: 960px) {
+    .anselma-template .kat-page__side-to-side .primary-pane {
+        display: none;
+    }
+
+    .anselma-template .kat-page__side-to-side .secondary-pane {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+/* Mobile font tuning */
+@media (max-width: 960px) {
+    body.anselma-template {
+        --heading-size: 58px;
+        --body-text-size: 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    body.anselma-template {
+        --heading-size: 44px;
+        --body-text-size: 16px;
+    }
+}

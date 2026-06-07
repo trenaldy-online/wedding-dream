@@ -1,0 +1,147 @@
+:root {
+    --cream: #f8f3ea;
+    --sage: #6f8f72;
+    --dark-sage: #405244;
+    --gold: #c8a96a;
+    --text: #2f2f2f;
+    --muted: #777;
+    --white: #ffffff;
+}
+
+body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+}
+
+.invitation-wrapper {
+    min-height: 100vh;
+    padding: 40px 16px;
+}
+
+.invitation-card {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.hero-section {
+    position: relative;
+    padding: 72px 32px;
+    text-align: center;
+    background: linear-gradient(160deg, #ffffff 0%, #f4efe5 100%);
+}
+
+.hero-label {
+    color: var(--sage);
+    letter-spacing: 3px;
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+}
+
+.couple-name {
+    font-size: 52px;
+    line-height: 1.1;
+    color: var(--dark-sage);
+    margin-bottom: 24px;
+}
+
+.divider {
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+    margin: 28px auto;
+}
+
+.opening-text {
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+.content-section {
+    padding: 44px 32px;
+}
+
+.info-box {
+    background: #f9f6ef;
+    border: 1px solid #eee3d2;
+    border-radius: 24px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--sage);
+    margin-bottom: 8px;
+}
+
+.info-title {
+    font-size: 22px;
+    color: var(--dark-sage);
+    margin-bottom: 8px;
+}
+
+.info-text {
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+.story-section {
+    margin-top: 28px;
+    text-align: center;
+}
+
+.section-title {
+    color: var(--dark-sage);
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.story-text {
+    color: var(--muted);
+    line-height: 1.9;
+    font-size: 16px;
+}
+
+.footer-section {
+    padding: 36px 32px;
+    text-align: center;
+    background: var(--dark-sage);
+    color: white;
+}
+
+.footer-section p {
+    margin-bottom: 0;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 576px) {
+    .invitation-wrapper {
+        padding: 20px 12px;
+    }
+
+    .hero-section {
+        padding: 56px 24px;
+    }
+
+    .couple-name {
+        font-size: 40px;
+    }
+
+    .content-section {
+        padding: 32px 20px;
+    }
+}
