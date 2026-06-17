@@ -28,7 +28,8 @@ class ChecklistItem extends Model
         'last_checked_at',
         'is_dummy',
         'sync_note',
-    ];
+    
+        'priority',];
 
     protected $casts = [
         'due_date' => 'date',

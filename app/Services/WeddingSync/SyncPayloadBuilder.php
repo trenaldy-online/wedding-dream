@@ -81,6 +81,14 @@ class SyncPayloadBuilder
                 'address',
                 'event_key',
                 'total_invited',
+                'rsvp_status',
+                'rsvp_count',
+                'invitation_status',
+                'attendance_status',
+                'actual_attendance_count',
+                'envelope_amount',
+                'souvenir_status',
+                'souvenir_count',
                 'is_active',
                 'sync_note',
             ],
@@ -102,6 +110,7 @@ class SyncPayloadBuilder
                 'title',
                 'assigned_to',
                 'due_date',
+                'priority',
                 'status',
                 'sync_note',
             ],
@@ -134,6 +143,8 @@ class SyncPayloadBuilder
 
     private function sheetGuestPayload(array $row): ?array
     {
+        $guestKey = $this->clean($row['guest_key'] ?? null);
+        $sourceWebKey = $this->clean($row['source_web_key'] ?? null);
         $key = $this->pickRecordKey($row, ['source_web_key', 'guest_key']);
         $name = $this->clean($row['nama_tamu'] ?? null);
 
@@ -141,44 +152,173 @@ class SyncPayloadBuilder
             return null;
         }
 
+        $legacy = $this->extractLegacyGuestNote($row['catatan'] ?? null);
+
+        $rsvpStatus = $this->normalizeRsvpStatus(
+            $row['rsvp_status']
+            ?? $row['rsvp']
+            ?? $legacy['rsvp_status']
+            ?? null
+        );
+
+        $invitationStatus = $this->normalizeInvitationStatus(
+            $row['invitation_status']
+            ?? $row['status_undangan']
+            ?? $legacy['invitation_status']
+            ?? null
+        );
+
+        $attendanceStatus = $this->normalizeAttendanceStatus(
+            $row['attendance_status']
+            ?? $row['kehadiran']
+            ?? $legacy['attendance_status']
+            ?? null
+        );
+
+        $souvenirStatus = $this->normalizeSouvenirStatus(
+            $row['souvenir_status']
+            ?? $row['souvenir']
+            ?? $legacy['souvenir_status']
+            ?? null
+        );
+
         return [
             'module' => 'guests',
             'record_key' => $key,
+            'guest_key' => $guestKey,
+            'source_web_key' => $sourceWebKey,
+            'origin' => $sourceWebKey ? 'web' : 'sheet',
             'name' => $name,
-            'phone' => $this->normalizePhone($row['nomor_wa'] ?? null),
-            'group_name' => $this->clean($row['grup'] ?? null),
+            'phone' => $this->normalizePhone($row['nomor_wa'] ?? $row['kontak'] ?? null),
+            'group_name' => $this->clean($row['grup'] ?? $row['kelompok'] ?? null),
             'address' => $this->clean($row['alamat'] ?? null),
-            'event_key' => strtoupper($this->clean($row['event_key'] ?? null)),
-            'total_invited' => $this->normalizeInteger($row['max_invited'] ?? 1, 1),
+            'event_key' => strtoupper($this->clean($row['event_key'] ?? $row['pihak'] ?? null)),
+            'total_invited' => $this->normalizeInteger(
+                $row['max_invited']
+                ?? $row['jumlah_undangan']
+                ?? null,
+                1
+            ),
+            'rsvp_status' => $rsvpStatus,
+            'rsvp_count' => $this->normalizeInteger(
+                $row['rsvp_count']
+                ?? $row['estimasi_hadir']
+                ?? $row['jumlah_rsvp']
+                ?? null,
+                0
+            ),
+            'invitation_status' => $invitationStatus,
+            'attendance_status' => $attendanceStatus,
+            'actual_attendance_count' => $this->normalizeInteger(
+                $row['actual_attendance_count']
+                ?? $row['jumlah_hadir_aktual']
+                ?? $row['jumlah_hadir']
+                ?? null,
+                0
+            ),
+            'envelope_amount' => $this->normalizeAmount(
+                $row['envelope_amount']
+                ?? $row['nominal_amplop']
+                ?? $legacy['envelope_amount']
+                ?? null
+            ),
+            'souvenir_status' => $souvenirStatus,
+            'souvenir_count' => $this->normalizeInteger(
+                $row['souvenir_count']
+                ?? $row['jumlah_souvenir']
+                ?? null,
+                $souvenirStatus === 'given' ? 1 : 0
+            ),
             'is_active' => $this->normalizeYesNo($row['is_active'] ?? 'YES'),
-            'sync_note' => $this->clean($row['catatan'] ?? null),
+            'sync_note' => $this->clean(
+                $row['catatan_manual']
+                ?? $row['note']
+                ?? $legacy['sync_note']
+                ?? $row['catatan']
+                ?? null
+            ),
+            'sheet_updated_at' => $this->normalizeDateTime($row['sheet_updated_at'] ?? null),
             'sync_action' => strtoupper($this->clean($row['sync_action'] ?? 'UPSERT')),
         ];
     }
 
     private function sheetBudgetPayload(array $row): ?array
     {
-        $key = $this->pickRecordKey($row, ['source_web_key', 'budget_key']);
-        $item = $this->clean($row['item'] ?? null);
+        $blankLike = function ($value): string {
+            $value = trim((string) ($value ?? ''));
 
-        if (!$key && !$item) {
+            $invalidTokens = [
+                '#N/A',
+                '#VALUE!',
+                '#REF!',
+                '#ERROR!',
+                '#DIV/0!',
+                'N/A',
+                'NULL',
+                '-',
+            ];
+
+            if ($value === '') {
+                return '';
+            }
+
+            if (in_array(strtoupper($value), $invalidTokens, true)) {
+                return '';
+            }
+
+            return $value;
+        };
+
+        $key = $blankLike($this->pickRecordKey($row, ['source_web_key', 'budget_key']));
+
+        $category = $blankLike($row['kategori'] ?? $row['category'] ?? null);
+        $itemName = $blankLike($row['item'] ?? $row['item_name'] ?? $row['nama_item'] ?? null);
+        $vendor = $blankLike($row['vendor'] ?? null);
+        $eventSide = strtoupper($blankLike($row['pihak'] ?? $row['event_side'] ?? $row['side'] ?? null));
+        $syncNote = $blankLike($row['catatan'] ?? $row['sync_note'] ?? null);
+        $syncAction = strtoupper($blankLike($row['sync_action'] ?? 'UPSERT'));
+
+        $estimatedAmount = $this->normalizeAmount($row['estimasi'] ?? $row['estimated_amount'] ?? null);
+        $actualAmount = $this->normalizeAmount($row['aktual'] ?? $row['actual_amount'] ?? null);
+
+        /*
+         * Guard utama:
+         * INPUT_BUDGET bisa menghasilkan row ghost dari formula.
+         * Kunci saja tidak cukup untuk dianggap data valid.
+         * Data budget valid minimal harus punya salah satu:
+         * category / item / vendor / estimated_amount > 0 / actual_amount > 0.
+         */
+        $hasCoreBudgetValue =
+            $category !== ''
+            || $itemName !== ''
+            || $vendor !== ''
+            || ((float) $estimatedAmount > 0)
+            || ((float) $actualAmount > 0);
+
+        if (!$hasCoreBudgetValue) {
             return null;
         }
+
+        /*
+         * Kalau row punya isi bisnis tapi belum punya key, tetap boleh dibaca
+         * supaya item manual dari sheet bisa menjadi sheet_only.
+         */
+        $paymentStatus = $this->normalizePaymentStatus($row['status_bayar'] ?? $row['status'] ?? $row['payment_status'] ?? null);
 
         return [
             'module' => 'budget_items',
             'record_key' => $key,
-            'event_side' => strtoupper($this->clean($row['pihak'] ?? null)),
-            'category' => $this->clean($row['kategori'] ?? null),
-            'item_name' => $item,
-            'vendor' => $this->clean($row['vendor'] ?? null),
-            'estimated_amount' => $this->normalizeAmount($row['estimated_amount'] ?? $row['estimasi'] ?? null),
-            'actual_amount' => $this->normalizeAmount($row['actual_amount'] ?? $row['aktual'] ?? null),
-            'payment_status' => $this->normalizePaymentStatus($row['payment_status'] ?? $row['status_bayar'] ?? $row['status'] ?? null),
-            'deadline_bayar' => $this->normalizeDate($row['deadline_bayar'] ?? null),
+            'event_side' => $eventSide,
+            'category' => $category ?: null,
+            'item_name' => $itemName ?: null,
+            'vendor' => $vendor ?: null,
+            'estimated_amount' => $estimatedAmount,
+            'actual_amount' => $actualAmount,
+            'payment_status' => $paymentStatus,
             'tanggal_bayar' => $this->normalizeDate($row['tanggal_bayar'] ?? null),
-            'sync_note' => $this->clean($row['catatan'] ?? null),
-            'sync_action' => strtoupper($this->clean($row['sync_action'] ?? 'UPSERT')),
+            'deadline_bayar' => $this->normalizeDate($row['deadline_bayar'] ?? null),
+            'sync_note' => $syncNote ?: null,
+            'sync_action' => $syncAction ?: 'UPSERT',
         ];
     }
 
@@ -339,6 +479,8 @@ private function webEventPayload(WeddingEvent $event): array
 
     private function webGuestPayload(Guest $guest): array
     {
+        $invitationStatus = $guest->invitation_sent_at ? 'sent' : 'pending';
+
         return [
             'module' => 'guests',
             'web_model' => Guest::class,
@@ -352,10 +494,20 @@ private function webEventPayload(WeddingEvent $event): array
                 $guest->weddingEvent?->sheet_key ?: $guest->weddingEvent?->event_side
             )),
             'total_invited' => $this->normalizeInteger($guest->total_invited ?? 1, 1),
+            'rsvp_status' => $this->normalizeRsvpStatus($guest->rsvp_status ?? null),
+            'rsvp_count' => $this->normalizeInteger($guest->rsvp_count ?? 0, 0),
+            'invitation_status' => $invitationStatus,
+            'attendance_status' => $this->normalizeAttendanceStatus($guest->attendance_status ?? null),
+            'actual_attendance_count' => $this->normalizeInteger($guest->actual_attendance_count ?? 0, 0),
+            'envelope_amount' => $this->normalizeAmount($guest->envelope_amount ?? 0),
+            'souvenir_status' => $this->normalizeSouvenirStatus($guest->souvenir_status ?? null),
+            'souvenir_count' => $this->normalizeInteger($guest->souvenir_count ?? 0, 0),
             'is_active' => 'YES',
             'is_dummy' => (bool) ($guest->is_dummy ?? false),
             'sync_source' => $this->clean($guest->sync_source ?? null),
             'sync_note' => $this->clean($guest->sync_note ?? null),
+            'sheet_updated_at' => optional($guest->sheet_updated_at)->format('Y-m-d H:i:s'),
+            'web_updated_at' => optional($guest->updated_at)->format('Y-m-d H:i:s'),
         ];
     }
 
@@ -427,7 +579,9 @@ private function webEventPayload(WeddingEvent $event): array
             'title' => $this->clean($task->title),
             'assigned_to' => $assignedTo,
             'due_date' => optional($task->due_date)->format('Y-m-d'),
-            'priority' => null,
+            'priority' => $isDocumentTask
+                ? null
+                : ($this->clean($task->priority ?? null) ?: 'Wajib'),
             'status' => $this->normalizeChecklistStatus($task->status),
             'sync_note' => $this->clean($task->sync_note ?? $task->note),
             'is_dummy' => (bool) ($task->is_dummy ?? false),
@@ -510,6 +664,193 @@ private function normalizeAssignedTo(mixed $value): string
         }
 
         return 'todo';
+    }
+
+    private function extractLegacyGuestNote(mixed $value): array
+    {
+        $text = $this->clean($value);
+
+        $result = [
+            'rsvp_status' => null,
+            'invitation_status' => null,
+            'attendance_status' => null,
+            'envelope_amount' => null,
+            'souvenir_status' => null,
+            'sync_note' => $text,
+        ];
+
+        if (!$text || !str_contains($text, ':')) {
+            return $result;
+        }
+
+        $parts = preg_split('/\\s*\\|\\s*/', $text) ?: [];
+        $foundStructuredPart = false;
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+
+            if ($part === '') {
+                continue;
+            }
+
+            if (preg_match('/^RSVP\\s+lama\\s*:\\s*(.*)$/iu', $part, $matches)) {
+                $result['rsvp_status'] = $this->normalizeRsvpStatus($matches[1] ?? null);
+                $foundStructuredPart = true;
+                continue;
+            }
+
+            if (preg_match('/^Status\\s+Undangan\\s*:\\s*(.*)$/iu', $part, $matches)) {
+                $result['invitation_status'] = $this->normalizeInvitationStatus($matches[1] ?? null);
+                $foundStructuredPart = true;
+                continue;
+            }
+
+            if (preg_match('/^Kehadiran\\s*:\\s*(.*)$/iu', $part, $matches)) {
+                $result['attendance_status'] = $this->normalizeAttendanceStatus($matches[1] ?? null);
+                $foundStructuredPart = true;
+                continue;
+            }
+
+            if (preg_match('/^Nominal\\s+amplop\\s*:\\s*(.*)$/iu', $part, $matches)) {
+                $result['envelope_amount'] = $this->normalizeAmount($matches[1] ?? null);
+                $foundStructuredPart = true;
+                continue;
+            }
+
+            if (preg_match('/^Souvenir\\s*:\\s*(.*)$/iu', $part, $matches)) {
+                $result['souvenir_status'] = $this->normalizeSouvenirStatus($matches[1] ?? null);
+                $foundStructuredPart = true;
+                continue;
+            }
+
+            if (preg_match('/^Catatan\\s*:\\s*(.*)$/isu', $part, $matches)) {
+                $result['sync_note'] = $this->clean($matches[1] ?? null);
+                $foundStructuredPart = true;
+                continue;
+            }
+        }
+
+        if (!$foundStructuredPart) {
+            $result['sync_note'] = $text;
+        }
+
+        return $result;
+    }
+
+    private function normalizeRsvpStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'pending';
+        }
+
+        if (in_array($value, ['attend', 'hadir', 'ya', 'yes', 'confirmed', 'konfirmasi hadir'], true)) {
+            return 'attend';
+        }
+
+        if (str_contains($value, 'tidak') || str_contains($value, 'not attend') || str_contains($value, 'decline')) {
+            return 'not_attend';
+        }
+
+        if (str_contains($value, 'belum') || str_contains($value, 'pending') || str_contains($value, 'konfirmasi')) {
+            return 'pending';
+        }
+
+        return $value;
+    }
+
+    private function normalizeInvitationStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'pending';
+        }
+
+        /*
+         * Penting:
+         * "Belum Dikirim" mengandung kata "dikirim",
+         * jadi kondisi "belum" harus dicek lebih dulu.
+         */
+        if (str_contains($value, 'belum')
+            || str_contains($value, 'pending')
+            || str_contains($value, 'not sent')
+            || str_contains($value, 'belum terkirim')) {
+            return 'pending';
+        }
+
+        if (str_contains($value, 'terkirim')
+            || str_contains($value, 'sudah dikirim')
+            || str_contains($value, 'sudah terkirim')
+            || str_contains($value, 'sent')) {
+            return 'sent';
+        }
+
+        return 'pending';
+    }
+
+    private function normalizeAttendanceStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'not_arrived';
+        }
+
+        if ((str_contains($value, 'hadir') || str_contains($value, 'arrived') || str_contains($value, 'check in'))
+            && !str_contains($value, 'belum')
+            && !str_contains($value, 'tidak')) {
+            return 'arrived';
+        }
+
+        return 'not_arrived';
+    }
+
+    private function normalizeSouvenirStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'not_given';
+        }
+
+        if (in_array($value, ['ya', 'yes', 'given', 'diberikan', 'sudah diberikan', 'sudah'], true)) {
+            return 'given';
+        }
+
+        return 'not_given';
+    }
+
+    private function normalizeDateTime(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            try {
+                return Carbon::createFromDate(1899, 12, 30)
+                    ->addDays((int) $value)
+                    ->format('Y-m-d H:i:s');
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
+        try {
+            return Carbon::parse((string) $value)->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return $this->clean($value);
+        }
     }
 
     private function shouldSkipSheetPayload(array $payload): bool

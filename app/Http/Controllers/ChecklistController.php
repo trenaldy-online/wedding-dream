@@ -36,7 +36,9 @@ class ChecklistController extends Controller
                     WHEN status = 'todo' THEN 1
                     WHEN status = 'in_progress' THEN 2
                     WHEN status = 'done' THEN 3
-                    ELSE 4
+                    WHEN status = 'postponed' THEN 4
+                    WHEN status = 'cancelled' THEN 5
+                    ELSE 6
                 END
             ")
             ->orderByRaw("CASE WHEN due_date IS NULL THEN 1 ELSE 0 END")
@@ -66,6 +68,10 @@ class ChecklistController extends Controller
             ? min(100, round(($doneItems / $totalItems) * 100))
             : 0;
 
+        $categoryOptions = $this->checklistCategoryOptions();
+        $priorityOptions = $this->checklistPriorityOptions();
+        $statusOptions = $this->checklistStatusOptions();
+
         return view('checklists.index', compact(
             'profile',
             'events',
@@ -78,7 +84,10 @@ class ChecklistController extends Controller
             'cppItems',
             'cpwItems',
             'bothItems',
-            'progressPercent'
+            'progressPercent',
+            'categoryOptions',
+            'priorityOptions',
+            'statusOptions'
         ));
     }
 
@@ -88,11 +97,30 @@ class ChecklistController extends Controller
             'wedding_event_id' => ['nullable', 'exists:wedding_events,id'],
             'title' => ['required', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
+            'priority' => ['nullable', 'in:Wajib,Penting,Opsional,Bisa Ditunda'],
             'assigned_to' => ['required', 'in:cpp,cpw,both'],
-            'status' => ['required', 'in:todo,in_progress,done'],
+            'status' => ['required', 'in:todo,in_progress,done,postponed,cancelled'],
             'due_date' => ['nullable', 'date'],
             'note' => ['nullable', 'string'],
         ]);
+
+        $validated['category'] = trim((string) ($validated['category'] ?? '')) ?: 'Persiapan';
+        $validated['priority'] = $validated['priority'] ?? 'Wajib';
+
+        $validated['category'] = trim((string) ($validated['category'] ?? '')) ?: 'Persiapan';
+        $validated['priority'] = $validated['priority'] ?? 'Wajib';
+
+        $validated['category'] = trim((string) ($validated['category'] ?? ''));
+
+        if ($validated['category'] === '') {
+            $validated['category'] = 'Persiapan';
+        }
+
+        if (in_array(strtolower($validated['category']), ['dokumen', 'dokumen nikah'], true)) {
+            $validated['category'] = 'Dokumen Nikah';
+        }
+
+        $validated['priority'] = $validated['priority'] ?? 'Wajib';
 
         $profile = WeddingProfile::first();
 
@@ -123,7 +151,17 @@ class ChecklistController extends Controller
             ->orderBy('event_name')
             ->get();
 
-        return view('checklists.edit', compact('checklist', 'events'));
+        $categoryOptions = $this->checklistCategoryOptions();
+        $priorityOptions = $this->checklistPriorityOptions();
+        $statusOptions = $this->checklistStatusOptions();
+
+        return view('checklists.edit', compact(
+            'checklist',
+            'events',
+            'categoryOptions',
+            'priorityOptions',
+            'statusOptions'
+        ));
     }
 
     public function update(Request $request, ChecklistItem $checklist)
@@ -132,11 +170,24 @@ class ChecklistController extends Controller
             'wedding_event_id' => ['nullable', 'exists:wedding_events,id'],
             'title' => ['required', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
+            'priority' => ['nullable', 'in:Wajib,Penting,Opsional,Bisa Ditunda'],
             'assigned_to' => ['required', 'in:cpp,cpw,both'],
-            'status' => ['required', 'in:todo,in_progress,done'],
+            'status' => ['required', 'in:todo,in_progress,done,postponed,cancelled'],
             'due_date' => ['nullable', 'date'],
             'note' => ['nullable', 'string'],
         ]);
+
+        $validated['category'] = trim((string) ($validated['category'] ?? ''));
+
+        if ($validated['category'] === '') {
+            $validated['category'] = 'Persiapan';
+        }
+
+        if (in_array(strtolower($validated['category']), ['dokumen', 'dokumen nikah'], true)) {
+            $validated['category'] = 'Dokumen Nikah';
+        }
+
+        $validated['priority'] = $validated['priority'] ?? 'Wajib';
 
         $profile = WeddingProfile::first();
 
@@ -183,4 +234,60 @@ class ChecklistController extends Controller
             ->route('checklists.index', ['event_id' => $eventId ?: 'global'])
             ->with('success', 'Checklist berhasil dihapus.');
     }
+    private function checklistCategoryOptions()
+    {
+        $defaults = collect([
+            'Persiapan',
+            'Dokumen Nikah',
+            'Keluarga',
+            'Busana',
+            'Mahar',
+            'Vendor',
+            'Acara',
+            'Kesehatan',
+            'Lainnya',
+        ]);
+
+        $fromDatabase = ChecklistItem::query()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        return $defaults
+            ->merge($fromDatabase)
+            ->filter()
+            ->map(fn ($category) => trim((string) $category))
+            ->unique()
+            ->values();
+    }
+
+    private function checklistPriorityOptions(): array
+    {
+        return [
+            'Wajib' => 'Wajib',
+            'Penting' => 'Penting',
+            'Opsional' => 'Opsional',
+            'Bisa Ditunda' => 'Bisa Ditunda',
+        ];
+    }
+
+    private function checklistStatusOptions(): array
+    {
+        return [
+            'todo' => 'Belum',
+            'in_progress' => 'Proses',
+            'done' => 'Selesai',
+            'postponed' => 'Ditunda',
+            'cancelled' => 'Batal',
+        ];
+    }
+
+    private function checklistStatusLabel(?string $status): string
+    {
+        return $this->checklistStatusOptions()[$status ?: 'todo'] ?? 'Belum';
+    }
+
+
 }

@@ -41,8 +41,17 @@ class WebToStagingSheetExporter
         $this->sheets->ensureSheetWithHeaders($sheetName, $headers);
 
         $alreadyExists = $this->sheets->rowExistsByKey($sheetName, $keyHeader, $keyValue);
+        $sheetWriteAction = 'appended';
 
-        if (!$alreadyExists) {
+        if ($alreadyExists) {
+            $updated = $this->sheets->updateRowByKey($sheetName, $keyHeader, $keyValue, $row, $headers);
+
+            if (!$updated) {
+                throw new RuntimeException("Row {$keyValue} sudah terdeteksi ada, tetapi gagal di-update di sheet {$sheetName}.");
+            }
+
+            $sheetWriteAction = 'updated';
+        } else {
             $this->sheets->appendRow($sheetName, $row);
         }
 
@@ -65,12 +74,13 @@ class WebToStagingSheetExporter
                 'key_value' => $keyValue,
                 'row' => $row,
                 'already_exists' => $alreadyExists,
+                'sheet_write_action' => $sheetWriteAction,
                 'exported_at' => now()->toDateTimeString(),
             ],
             'note' => trim(
                 ($difference->note ?? '') .
                 "\nStaged Web → {$sheetName}. " .
-                ($alreadyExists ? 'Row already existed; not appended again.' : 'New row appended.')
+                ($sheetWriteAction === 'updated' ? 'Existing row updated.' : 'New row appended.')
             ),
         ]);
 
@@ -195,6 +205,14 @@ class WebToStagingSheetExporter
             'alamat',
             'event_key',
             'max_invited',
+            'rsvp_status',
+            'rsvp_count',
+            'invitation_status',
+            'attendance_status',
+            'actual_attendance_count',
+            'envelope_amount',
+            'souvenir_status',
+            'souvenir_count',
             'catatan',
             'is_active',
             'sync_action',
@@ -204,13 +222,27 @@ class WebToStagingSheetExporter
         $guestKey = $record->sheet_key ?: $this->makeGuestKey($record, $side);
         $eventKey = strtoupper($record->weddingEvent?->sheet_key ?: $record->weddingEvent?->event_side ?: $side);
 
+        $invitationStatus = $record->invitation_sent_at ? 'sent' : 'pending';
+
         $record->update([
             'sheet_key' => $guestKey,
             'web_hash' => $this->hasher->make([
                 'guest_key' => $guestKey,
                 'name' => $record->name,
-                'phone' => $record->phone,
+                'phone' => $this->normalizePhone($record->phone),
+                'group_name' => $record->group_name,
+                'address' => $record->address,
                 'event_key' => $eventKey,
+                'total_invited' => (int) ($record->total_invited ?: 1),
+                'rsvp_status' => $record->rsvp_status ?: 'pending',
+                'rsvp_count' => (int) ($record->rsvp_count ?? 0),
+                'invitation_status' => $invitationStatus,
+                'attendance_status' => $record->attendance_status ?: 'not_arrived',
+                'actual_attendance_count' => (int) ($record->actual_attendance_count ?? 0),
+                'envelope_amount' => (int) ($record->envelope_amount ?? 0),
+                'souvenir_status' => $record->souvenir_status ?: 'not_given',
+                'souvenir_count' => (int) ($record->souvenir_count ?? 0),
+                'sync_note' => $record->sync_note,
             ]),
         ]);
 
@@ -226,7 +258,15 @@ class WebToStagingSheetExporter
                 $record->group_name,
                 $record->address,
                 $eventKey,
-                $record->total_invited ?: 1,
+                (int) ($record->total_invited ?: 1),
+                $this->rsvpStatusToSheet($record->rsvp_status),
+                (int) ($record->rsvp_count ?? 0),
+                $this->invitationStatusToSheet($invitationStatus),
+                $this->attendanceStatusToSheet($record->attendance_status),
+                (int) ($record->actual_attendance_count ?? 0),
+                (int) ($record->envelope_amount ?? 0),
+                $this->souvenirStatusToSheet($record->souvenir_status),
+                (int) ($record->souvenir_count ?? 0),
                 $record->sync_note ?: 'Staged from Web.',
                 'YES',
                 'UPSERT',
@@ -349,7 +389,7 @@ class WebToStagingSheetExporter
                 $record->title,
                 $record->assigned_to,
                 $this->dateValue($record->due_date),
-                null,
+                $record->priority ?: 'Wajib',
                 $this->checklistStatusToSheet($record->status),
                 $record->sync_note ?: $record->note ?: 'Staged from Web.',
                 'UPSERT',
@@ -397,7 +437,7 @@ class WebToStagingSheetExporter
             [
                 $docKey,
                 $side,
-                'Web',
+                'Dokumen',
                 $record->title,
                 $record->note,
                 null,
@@ -471,6 +511,38 @@ class WebToStagingSheetExporter
         }
 
         return $phone;
+    }
+
+    private function rsvpStatusToSheet(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+
+        return match ($value) {
+            'attend' => 'Hadir',
+            'not_attend' => 'Tidak Hadir',
+            default => 'Belum Konfirmasi',
+        };
+    }
+
+    private function invitationStatusToSheet(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+
+        return $value === 'sent' ? 'Terkirim' : 'Belum Dikirim';
+    }
+
+    private function attendanceStatusToSheet(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+
+        return $value === 'arrived' ? 'Hadir' : 'Belum Hadir';
+    }
+
+    private function souvenirStatusToSheet(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+
+        return $value === 'given' ? 'Ya' : 'Tidak';
     }
 
     private function paymentStatusToSheet(mixed $value): string

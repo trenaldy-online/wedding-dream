@@ -703,18 +703,20 @@
 
                 <div class="form-group">
                     <label class="form-label">Kategori</label>
-                    <select name="category" class="form-select">
-                        <option value="">-- Pilih Kategori --</option>
+                    <input
+                            type="text"
+                            name="category"
+                            class="form-control"
+                            list="budget-category-options"
+                            value="{{ old('category', $budgetItem->category) }}"
+                            placeholder="Contoh: Makanan, Dekorasi, Venue"
+                        >
 
-                        @foreach (['Catering', 'Dekorasi', 'Mahar', 'Venue', 'Dokumentasi', 'Undangan', 'Souvenir', 'Makeup', 'Busana', 'Lainnya'] as $category)
-                            <option
-                                value="{{ $category }}"
-                                {{ old('category', $budgetItem->category) === $category ? 'selected' : '' }}
-                            >
-                                {{ $category }}
-                            </option>
-                        @endforeach
-                    </select>
+                        <datalist id="budget-category-options">
+                            @foreach (($categoryOptions ?? collect()) as $category)
+                                <option value="{{ $category }}"></option>
+                            @endforeach
+                        </datalist>
                 </div>
             </div>
 

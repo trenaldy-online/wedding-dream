@@ -39,7 +39,7 @@ class SheetToWebImporter
         return DB::transaction(function () use ($difference, $payload, $adminId) {
             $record = match ($difference->module) {
                 'events' => $this->importEvent($payload),
-                'guests' => $this->importGuest($payload),
+                'guests' => $this->importGuest($payload, $difference),
                 'budget_items' => $this->importBudgetItem($payload),
                 'checklist_items' => $this->importChecklistItem($payload, $difference->sheet_name),
                 default => throw new RuntimeException('Module belum didukung: ' . $difference->module),
@@ -101,7 +101,7 @@ class SheetToWebImporter
         );
     }
 
-    private function importGuest(array $payload): Guest
+    private function importGuest(array $payload, ?SyncDifference $difference = null): Guest
     {
         $recordKey = $this->value($payload, 'record_key');
 
@@ -112,9 +112,56 @@ class SheetToWebImporter
         $event = $this->findOrCreateEventForPayload($payload);
         $profile = $event?->weddingProfile ?: $this->profile();
 
-        $existing = Guest::where('sheet_key', $recordKey)->first();
+        $existing = null;
+
+        if ($difference?->web_id && $difference?->web_model === Guest::class) {
+            $existing = Guest::find($difference->web_id);
+        }
+
+        if (!$existing) {
+            $existing = Guest::where('sheet_key', $recordKey)->first();
+        }
+
+        $sourceWebKey = $this->value($payload, 'source_web_key');
+
+        if (!$existing && $sourceWebKey) {
+            $existing = Guest::where('sheet_key', $sourceWebKey)->first();
+        }
 
         $invitationCode = $existing?->invitation_code ?: $this->makeUniqueInvitationCode();
+
+        $totalInvited = $this->payloadInt($payload, 'total_invited', 1, 1);
+
+        $rsvpStatus = $this->normalizeRsvpStatus($payload['rsvp_status'] ?? null);
+        $rsvpCount = $this->payloadInt($payload, 'rsvp_count', 0, 0);
+
+        if ($rsvpStatus === 'attend' && $rsvpCount < 1) {
+            $rsvpCount = 1;
+        }
+
+        if ($rsvpStatus === 'not_attend') {
+            $rsvpCount = 0;
+        }
+
+        $invitationStatus = $this->normalizeInvitationStatus($payload['invitation_status'] ?? null);
+
+        $attendanceStatus = $this->normalizeAttendanceStatus($payload['attendance_status'] ?? null);
+        $actualAttendanceCount = $this->payloadInt($payload, 'actual_attendance_count', 0, 0);
+
+        if ($attendanceStatus === 'arrived' && $actualAttendanceCount < 1) {
+            $actualAttendanceCount = max(1, $rsvpCount);
+        }
+
+        $souvenirStatus = $this->normalizeSouvenirStatus($payload['souvenir_status'] ?? null);
+        $souvenirCount = $this->payloadInt($payload, 'souvenir_count', 0, 0);
+
+        if ($souvenirStatus === 'given' && $souvenirCount < 1) {
+            $souvenirCount = 1;
+        }
+
+        if ($souvenirStatus === 'not_given') {
+            $souvenirCount = 0;
+        }
 
         $data = [
             'wedding_profile_id' => $profile->id,
@@ -125,9 +172,30 @@ class SheetToWebImporter
             'invitation_code' => $invitationCode,
             'address' => $this->value($payload, 'address'),
             'group_name' => $this->value($payload, 'group_name'),
-            'total_invited' => max(1, (int) ($payload['total_invited'] ?? 1)),
-            'rsvp_status' => 'pending',
-            'invitation_sent_at' => null,
+            'total_invited' => $totalInvited,
+
+            /*
+             * Sistem 2: RSVP dari tamu.
+             */
+            'rsvp_status' => $rsvpStatus,
+            'rsvp_count' => $rsvpCount,
+            'rsvp_confirmed_at' => $this->resolveRsvpConfirmedAt($existing, $rsvpStatus),
+            'rsvp_note' => $this->value($payload, 'rsvp_note'),
+
+            /*
+             * Status undangan tetap memakai timestamp.
+             */
+            'invitation_sent_at' => $this->resolveInvitationSentAt($existing, $invitationStatus),
+
+            /*
+             * Sistem 3: data hari-H / setelah acara.
+             */
+            'attendance_status' => $attendanceStatus,
+            'actual_attendance_count' => $actualAttendanceCount,
+            'checked_in_at' => $this->resolveCheckedInAt($existing, $attendanceStatus),
+            'envelope_amount' => $this->payloadAmount($payload, 'envelope_amount'),
+            'souvenir_status' => $souvenirStatus,
+            'souvenir_count' => $souvenirCount,
 
             'sheet_key' => $recordKey,
             'sheet_row' => $payload['_sheet_row'] ?? null,
@@ -136,14 +204,19 @@ class SheetToWebImporter
             'web_hash' => null,
             'last_synced_at' => now(),
             'last_checked_at' => now(),
+            'sheet_updated_at' => $this->normalizeDateTime($payload['sheet_updated_at'] ?? null),
             'is_dummy' => false,
             'sync_note' => $this->value($payload, 'sync_note'),
         ];
 
-        $guest = Guest::updateOrCreate(
-            ['sheet_key' => $recordKey],
-            $data
-        );
+        if ($existing) {
+            $existing->fill($data);
+            $existing->save();
+
+            $guest = $existing;
+        } else {
+            $guest = Guest::create($data);
+        }
 
         $this->ensureGuestLink($guest);
 
@@ -232,6 +305,7 @@ class SheetToWebImporter
             'assigned_to' => $this->normalizeAssignedTo($payload['assigned_to'] ?? $payload['event_side'] ?? null),
             'status' => $status,
             'due_date' => $payload['due_date'] ?? null,
+            'priority' => $this->value($payload, 'priority') ?: 'Wajib',
             'note' => $this->value($payload, 'sync_note'),
             'completed_at' => $status === 'done' ? now() : null,
 
@@ -250,6 +324,183 @@ class SheetToWebImporter
             ['sheet_key' => $recordKey],
             $data
         );
+    }
+
+    private function payloadInt(array $payload, string $key, int $default = 0, int $min = 0): int
+    {
+        $value = $payload[$key] ?? null;
+
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        if (is_string($value)) {
+            $value = preg_replace('/[^0-9-]/', '', $value);
+        }
+
+        if ($value === '' || $value === null) {
+            return $default;
+        }
+
+        return max($min, (int) $value);
+    }
+
+    private function payloadAmount(array $payload, string $key): int
+    {
+        $value = $payload[$key] ?? 0;
+
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        if (is_string($value)) {
+            $value = preg_replace('/[^0-9]/', '', $value);
+        }
+
+        if ($value === '' || $value === null) {
+            return 0;
+        }
+
+        return max(0, (int) $value);
+    }
+
+    private function normalizeRsvpStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'pending';
+        }
+
+        if (in_array($value, ['attend', 'hadir', 'ya', 'yes', 'confirmed', 'konfirmasi hadir'], true)) {
+            return 'attend';
+        }
+
+        if (str_contains($value, 'tidak') || str_contains($value, 'not attend') || str_contains($value, 'decline')) {
+            return 'not_attend';
+        }
+
+        return 'pending';
+    }
+
+    private function normalizeInvitationStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'pending';
+        }
+
+        /*
+         * Penting:
+         * "Belum Dikirim" mengandung kata "dikirim",
+         * jadi kondisi "belum" harus dicek lebih dulu.
+         */
+        if (str_contains($value, 'belum')
+            || str_contains($value, 'pending')
+            || str_contains($value, 'not sent')
+            || str_contains($value, 'belum terkirim')) {
+            return 'pending';
+        }
+
+        if (str_contains($value, 'terkirim')
+            || str_contains($value, 'sudah dikirim')
+            || str_contains($value, 'sudah terkirim')
+            || str_contains($value, 'sent')) {
+            return 'sent';
+        }
+
+        return 'pending';
+    }
+
+    private function normalizeAttendanceStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'not_arrived';
+        }
+
+        if ((str_contains($value, 'hadir') || str_contains($value, 'arrived') || str_contains($value, 'check in'))
+            && !str_contains($value, 'belum')
+            && !str_contains($value, 'tidak')) {
+            return 'arrived';
+        }
+
+        return 'not_arrived';
+    }
+
+    private function normalizeSouvenirStatus(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(['_', '-'], ' ', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        if ($value === '') {
+            return 'not_given';
+        }
+
+        if (in_array($value, ['ya', 'yes', 'given', 'diberikan', 'sudah diberikan', 'sudah'], true)) {
+            return 'given';
+        }
+
+        return 'not_given';
+    }
+
+    private function resolveRsvpConfirmedAt(?Guest $guest, string $rsvpStatus): mixed
+    {
+        if ($rsvpStatus === 'pending') {
+            return null;
+        }
+
+        return $guest?->rsvp_confirmed_at ?: now();
+    }
+
+    private function resolveInvitationSentAt(?Guest $guest, string $invitationStatus): mixed
+    {
+        if ($invitationStatus !== 'sent') {
+            return null;
+        }
+
+        return $guest?->invitation_sent_at ?: now();
+    }
+
+    private function resolveCheckedInAt(?Guest $guest, string $attendanceStatus): mixed
+    {
+        if ($attendanceStatus !== 'arrived') {
+            return null;
+        }
+
+        return $guest?->checked_in_at ?: now();
+    }
+
+    private function normalizeDateTime(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            try {
+                return \Carbon\Carbon::createFromDate(1899, 12, 30)
+                    ->addDays((int) $value)
+                    ->format('Y-m-d H:i:s');
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
+        try {
+            return \Carbon\Carbon::parse((string) $value)->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private function findOrCreateEventForPayload(array $payload): ?WeddingEvent

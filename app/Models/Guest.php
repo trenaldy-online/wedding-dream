@@ -29,14 +29,33 @@ class Guest extends Model
         'last_checked_at',
         'is_dummy',
         'sync_note',
-    ];
+    
+        'rsvp_count',
+        'rsvp_confirmed_at',
+        'rsvp_note',
+        'attendance_status',
+        'actual_attendance_count',
+        'checked_in_at',
+        'envelope_amount',
+        'souvenir_status',
+        'souvenir_count',
+        'sheet_updated_at',];
 
     protected $casts = [
         'invitation_sent_at' => 'datetime',
         'last_synced_at' => 'datetime',
         'last_checked_at' => 'datetime',
         'is_dummy' => 'boolean',
-    ];
+    
+        'rsvp_count' => 'integer',
+        'rsvp_confirmed_at' => 'datetime',
+        'attendance_status' => 'string',
+        'actual_attendance_count' => 'integer',
+        'checked_in_at' => 'datetime',
+        'envelope_amount' => 'integer',
+        'souvenir_status' => 'string',
+        'souvenir_count' => 'integer',
+        'sheet_updated_at' => 'datetime',];
 
     public function weddingProfile(): BelongsTo
     {

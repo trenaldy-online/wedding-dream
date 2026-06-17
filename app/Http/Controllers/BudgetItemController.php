@@ -44,6 +44,8 @@ class BudgetItemController extends Controller
         $partialItems = (clone $baseQuery)->where('payment_status', 'partial')->count();
         $unpaidItems = (clone $baseQuery)->where('payment_status', 'unpaid')->count();
 
+        $categoryOptions = $this->budgetCategoryOptions();
+
         return view('budget.index', compact(
             'profile',
             'events',
@@ -129,4 +131,36 @@ class BudgetItemController extends Controller
             ->route('budget-items.index', ['event_id' => $eventId])
             ->with('success', 'Item budget berhasil dihapus.');
     }
+    private function budgetCategoryOptions()
+    {
+        $defaults = collect([
+            'Venue',
+            'Dekorasi',
+            'MUA',
+            'Konsumsi',
+            'Dokumentasi',
+            'Souvenir',
+            'Undangan',
+            'Transportasi',
+            'Hiburan',
+            'Makanan',
+            'Lainnya',
+        ]);
+
+        $fromDatabase = BudgetItem::query()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        return $defaults
+            ->merge($fromDatabase)
+            ->filter()
+            ->map(fn ($category) => trim((string) $category))
+            ->unique()
+            ->values();
+    }
+
+
 }

@@ -180,7 +180,66 @@
         align-items: flex-start;
     }
 }
-</style>
+
+        .form-accordion {
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.74);
+            margin-top: 22px;
+            overflow: hidden;
+        }
+
+        .form-accordion summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 22px 26px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #111827;
+        }
+
+        .form-accordion summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .form-accordion summary::after {
+            content: '+';
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: #f8edd2;
+            color: #a36f13;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            margin-left: 16px;
+        }
+
+        .form-accordion[open] summary::after {
+            content: '−';
+        }
+
+        .form-accordion summary strong {
+            display: block;
+            font-size: 17px;
+            letter-spacing: -0.02em;
+        }
+
+        .form-accordion summary small {
+            display: block;
+            margin-top: 5px;
+            color: #6b7280;
+            line-height: 1.45;
+        }
+
+        .form-section-soft {
+            border-top: 1px solid rgba(148, 163, 184, 0.18);
+            padding-top: 24px;
+        }
+
+    </style>
 @endpush
 
 @section('content')
@@ -311,11 +370,11 @@
 
                 <div class="form-section">
                     <div class="form-section-heading">
-                        <div class="form-section-icon">00</div>
+                        <div class="form-section-icon">01</div>
                         <div>
-                            <h3 class="form-section-title">Acara Undangan</h3>
+                            <h3 class="form-section-title">Data Awal Undangan</h3>
                             <div class="form-section-subtitle">
-                                Tentukan tamu ini diundang ke acara yang mana.
+                                Bagian utama yang biasa diisi catin/admin saat menambahkan tamu.
                             </div>
                         </div>
                     </div>
@@ -338,20 +397,8 @@
                             </select>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-section">
-                    <div class="form-section-heading">
-                        <div class="form-section-icon">01</div>
-                        <div>
-                            <h3 class="form-section-title">Informasi Utama</h3>
-                            <div class="form-section-subtitle">
-                                Nama, nomor WhatsApp, dan grup tamu.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-grid-2">
+                    <div class="form-grid-2" style="margin-top: 18px;">
                         <div class="form-group">
                             <label class="form-label">Nama Tamu</label>
                             <input
@@ -400,7 +447,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Jumlah Orang</label>
+                            <label class="form-label">Jumlah Undangan</label>
                             <input
                                 type="number"
                                 name="total_invited"
@@ -408,50 +455,173 @@
                                 min="1"
                                 value="{{ old('total_invited', $guest->total_invited) }}"
                             >
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="form-section-heading">
-                        <div class="form-section-icon">02</div>
-                        <div>
-                            <h3 class="form-section-title">Status dan Alamat</h3>
-                            <div class="form-section-subtitle">
-                                Atur status RSVP dan alamat tamu jika diperlukan.
+                            <div class="form-help">
+                                Kuota maksimal undangan, bukan jumlah hadir aktual.
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-grid-1">
-                        <div class="form-group">
-                            <label class="form-label">Status RSVP</label>
-                            <select name="rsvp_status" class="form-select">
-                                <option value="pending" {{ old('rsvp_status', $guest->rsvp_status) === 'pending' ? 'selected' : '' }}>
-                                    Belum Konfirmasi
-                                </option>
-
-                                <option value="attend" {{ old('rsvp_status', $guest->rsvp_status) === 'attend' ? 'selected' : '' }}>
-                                    Hadir
-                                </option>
-
-                                <option value="not_attend" {{ old('rsvp_status', $guest->rsvp_status) === 'not_attend' ? 'selected' : '' }}>
-                                    Tidak Hadir
-                                </option>
-                            </select>
-                        </div>
-
+                    <div class="form-grid-1" style="margin-top: 18px;">
                         <div class="form-group">
                             <label class="form-label">Alamat</label>
                             <textarea
                                 name="address"
                                 class="form-control"
-                                rows="5"
+                                rows="4"
                                 placeholder="Opsional"
                             >{{ old('address', $guest->address) }}</textarea>
                         </div>
+
+                        <div class="form-group" style="margin-top: 18px;">
+                            <label class="form-label">Catatan</label>
+                            <textarea
+                                name="sync_note"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Catatan tambahan untuk tamu ini"
+                            >{{ old('sync_note', $guest->sync_note) }}</textarea>
+                        </div>
                     </div>
                 </div>
+
+                <details class="form-accordion">
+                    <summary>
+                        <span>
+                            <strong>02 RSVP Tamu</strong>
+                            <small>Biasanya diisi oleh tamu melalui halaman undangan. Buka hanya jika perlu koreksi manual.</small>
+                        </span>
+                    </summary>
+
+                    <div class="form-section form-section-soft">
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Status RSVP</label>
+                                <select name="rsvp_status" class="form-select">
+                                    <option value="pending" {{ old('rsvp_status', $guest->rsvp_status) === 'pending' ? 'selected' : '' }}>
+                                        Belum Konfirmasi
+                                    </option>
+
+                                    <option value="attend" {{ old('rsvp_status', $guest->rsvp_status) === 'attend' ? 'selected' : '' }}>
+                                        Hadir
+                                    </option>
+
+                                    <option value="not_attend" {{ old('rsvp_status', $guest->rsvp_status) === 'not_attend' ? 'selected' : '' }}>
+                                        Tidak Hadir
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Estimasi Hadir / RSVP Count</label>
+                                <input
+                                    type="number"
+                                    name="rsvp_count"
+                                    class="form-control"
+                                    min="0"
+                                    value="{{ old('rsvp_count', $guest->rsvp_count ?? 0) }}"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-grid-1" style="margin-top: 18px;">
+                            <div class="form-group">
+                                <label class="form-label">Catatan RSVP</label>
+                                <textarea
+                                    name="rsvp_note"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Catatan dari tamu saat RSVP jika ada"
+                                >{{ old('rsvp_note', $guest->rsvp_note) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="form-accordion">
+                    <summary>
+                        <span>
+                            <strong>03 Data Hari-H / Setelah Acara</strong>
+                            <small>Diisi saat acara berjalan atau setelah acara selesai.</small>
+                        </span>
+                    </summary>
+
+                    <div class="form-section form-section-soft">
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Status Undangan</label>
+                                <select name="invitation_status" class="form-select">
+                                    <option value="pending" {{ old('invitation_status', $guest->invitation_sent_at ? 'sent' : 'pending') === 'pending' ? 'selected' : '' }}>
+                                        Belum Dikirim
+                                    </option>
+                                    <option value="sent" {{ old('invitation_status', $guest->invitation_sent_at ? 'sent' : 'pending') === 'sent' ? 'selected' : '' }}>
+                                        Terkirim
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Status Kehadiran</label>
+                                <select name="attendance_status" class="form-select">
+                                    <option value="not_arrived" {{ old('attendance_status', $guest->attendance_status ?? 'not_arrived') === 'not_arrived' ? 'selected' : '' }}>
+                                        Belum Hadir
+                                    </option>
+                                    <option value="arrived" {{ old('attendance_status', $guest->attendance_status ?? 'not_arrived') === 'arrived' ? 'selected' : '' }}>
+                                        Hadir
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2" style="margin-top: 18px;">
+                            <div class="form-group">
+                                <label class="form-label">Jumlah Hadir Aktual</label>
+                                <input
+                                    type="number"
+                                    name="actual_attendance_count"
+                                    class="form-control"
+                                    min="0"
+                                    value="{{ old('actual_attendance_count', $guest->actual_attendance_count ?? 0) }}"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Nominal Amplop</label>
+                                <input
+                                    type="number"
+                                    name="envelope_amount"
+                                    class="form-control"
+                                    min="0"
+                                    value="{{ old('envelope_amount', $guest->envelope_amount ?? 0) }}"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2" style="margin-top: 18px;">
+                            <div class="form-group">
+                                <label class="form-label">Souvenir</label>
+                                <select name="souvenir_status" class="form-select">
+                                    <option value="not_given" {{ old('souvenir_status', $guest->souvenir_status ?? 'not_given') === 'not_given' ? 'selected' : '' }}>
+                                        Belum Diberikan
+                                    </option>
+                                    <option value="given" {{ old('souvenir_status', $guest->souvenir_status ?? 'not_given') === 'given' ? 'selected' : '' }}>
+                                        Sudah Diberikan
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Jumlah Souvenir</label>
+                                <input
+                                    type="number"
+                                    name="souvenir_count"
+                                    class="form-control"
+                                    min="0"
+                                    value="{{ old('souvenir_count', $guest->souvenir_count ?? 0) }}"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </details>
 
                 <div class="invitation-submit-row">
                     <a href="{{ route('guests.index') }}" class="btn-soft-inline">

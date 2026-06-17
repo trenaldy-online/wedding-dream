@@ -429,6 +429,102 @@
     }
 }
 
+
+/* GUEST LIFECYCLE PREVIEW */
+
+.guest-note-preview {
+    margin-top: 4px;
+    color: #9ca3af;
+    font-size: 11px;
+    line-height: 1.35;
+    max-width: 240px;
+}
+
+.guest-mini-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 150px;
+}
+
+.lifecycle-preview-box {
+    min-width: 145px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.lifecycle-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.lifecycle-label {
+    color: #6b7280;
+    font-weight: 700;
+}
+
+.lifecycle-value {
+    color: #111827;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.lifecycle-status-grid {
+    min-width: 190px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.lifecycle-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 6px 9px;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.lifecycle-pill-muted {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.lifecycle-pill-green {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.lifecycle-pill-yellow {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.lifecycle-pill-red {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.lifecycle-pill-blue {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.lifecycle-money {
+    width: 100%;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
 .link-track-box {
     display: flex;
     flex-direction: column;
@@ -865,6 +961,18 @@
             <form method="POST" action="{{ route('guests.store') }}">
                 @csrf
 
+                {{-- Default sistem 2: RSVP dari tamu --}}
+                <input type="hidden" name="rsvp_status" value="pending">
+                <input type="hidden" name="rsvp_count" value="0">
+
+                {{-- Default sistem 3: hari-H / setelah acara --}}
+                <input type="hidden" name="invitation_status" value="pending">
+                <input type="hidden" name="attendance_status" value="not_arrived">
+                <input type="hidden" name="actual_attendance_count" value="0">
+                <input type="hidden" name="envelope_amount" value="0">
+                <input type="hidden" name="souvenir_status" value="not_given">
+                <input type="hidden" name="souvenir_count" value="0">
+
                 <div class="form-group">
                     <label class="form-label">Acara</label>
                     <select name="wedding_event_id" class="form-select">
@@ -924,20 +1032,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Status RSVP</label>
-                    <select name="rsvp_status" class="form-select">
-                        <option value="pending" {{ old('rsvp_status') === 'pending' ? 'selected' : '' }}>
-                            Belum Konfirmasi
-                        </option>
-
-                        <option value="attend" {{ old('rsvp_status') === 'attend' ? 'selected' : '' }}>
-                            Hadir
-                        </option>
-
-                        <option value="not_attend" {{ old('rsvp_status') === 'not_attend' ? 'selected' : '' }}>
-                            Tidak Hadir
-                        </option>
-                    </select>
+                    <label class="form-label">Jumlah Undangan</label>
+                    <input
+                        type="number"
+                        name="total_invited"
+                        class="form-control"
+                        min="1"
+                        value="{{ old('total_invited', 1) }}"
+                    >
+                    <div class="form-help">
+                        Kuota maksimal orang yang diundang. Estimasi hadir akan diisi saat tamu RSVP.
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -948,6 +1053,16 @@
                         rows="4"
                         placeholder="Opsional"
                     >{{ old('address') }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Catatan</label>
+                    <textarea
+                        name="sync_note"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Opsional, misalnya keluarga dekat, perlu follow up, dan sebagainya"
+                    >{{ old('sync_note') }}</textarea>
                 </div>
 
                 <button class="btn-primary" type="submit">
@@ -982,11 +1097,9 @@
                 <thead>
                     <tr>
                         <th>Nama Tamu</th>
-                        <th>Acara</th>
-                        <th>Grup</th>
-                        <th>Jumlah</th>
-                        <th>RSVP</th>
-                        <th>Status Kirim</th>
+                        <th>Acara & Grup</th>
+                        <th>Kuota & Kehadiran</th>
+                        <th>Status</th>
                         <th>Tracking Link</th>
                         <th>Aksi</th>
                     </tr>
@@ -1036,48 +1149,85 @@
                                         <div class="guest-name-sub">
                                             {{ $guest->phone ?: 'Nomor belum diisi' }}
                                         </div>
+
+                                        @if ($guest->sync_note)
+                                            <div class="guest-note-preview" title="{{ $guest->sync_note }}">
+                                                {{ \Illuminate\Support\Str::limit($guest->sync_note, 65) }}
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
 
                             <td>
-                                <span class="guest-group-pill">
-                                    {{ $guest->weddingEvent?->event_name ?: 'Belum ada acara' }}
-                                </span>
+                                <div class="guest-mini-stack">
+                                    <span class="guest-group-pill">
+                                        {{ $guest->weddingEvent?->event_name ?: 'Belum ada acara' }}
+                                    </span>
+
+                                    <span class="guest-group-pill">
+                                        {{ $guest->group_name ?: 'Tanpa Grup' }}
+                                    </span>
+                                </div>
                             </td>
 
                             <td>
-                                <span class="guest-group-pill">
-                                    {{ $guest->group_name ?: 'Tanpa Grup' }}
-                                </span>
+                                <div class="lifecycle-preview-box">
+                                    <div class="lifecycle-line">
+                                        <span class="lifecycle-label">Kuota</span>
+                                        <span class="lifecycle-value">{{ $guest->total_invited ?? 1 }} org</span>
+                                    </div>
+
+                                    <div class="lifecycle-line">
+                                        <span class="lifecycle-label">RSVP</span>
+                                        <span class="lifecycle-value">{{ $guest->rsvp_count ?? 0 }} org</span>
+                                    </div>
+
+                                    <div class="lifecycle-line">
+                                        <span class="lifecycle-label">Hadir</span>
+                                        <span class="lifecycle-value">{{ $guest->actual_attendance_count ?? 0 }} org</span>
+                                    </div>
+                                </div>
                             </td>
 
                             <td>
-                                @if ($guest->rsvp_status === 'attend')
-                                    <strong>{{ $guest->total_invited }}</strong> orang
-                                @elseif ($guest->rsvp_status === 'not_attend')
-                                    <span class="rsvp-pill rsvp-not-attend">0 orang</span>
-                                @else
-                                    <span class="rsvp-pill rsvp-pending">Belum RSVP</span>
-                                @endif
-                            </td>
+                                @php
+                                    $attendanceStatus = $guest->attendance_status ?? 'not_arrived';
+                                    $souvenirStatus = $guest->souvenir_status ?? 'not_given';
+                                    $envelopeAmount = (int) ($guest->envelope_amount ?? 0);
+                                @endphp
 
-                            <td>
-                                @if ($guest->rsvp_status === 'attend')
-                                    <span class="rsvp-pill rsvp-attend">Hadir</span>
-                                @elseif ($guest->rsvp_status === 'not_attend')
-                                    <span class="rsvp-pill rsvp-not-attend">Tidak Hadir</span>
-                                @else
-                                    <span class="rsvp-pill rsvp-pending">Pending</span>
-                                @endif
-                            </td>
+                                <div class="lifecycle-status-grid">
+                                    @if ($guest->rsvp_status === 'attend')
+                                        <span class="lifecycle-pill lifecycle-pill-green">RSVP: Hadir</span>
+                                    @elseif ($guest->rsvp_status === 'not_attend')
+                                        <span class="lifecycle-pill lifecycle-pill-red">RSVP: Tidak</span>
+                                    @else
+                                        <span class="lifecycle-pill lifecycle-pill-muted">RSVP: Belum</span>
+                                    @endif
 
-                            <td>
-                                @if ($guest->invitation_sent_at)
-                                    <span class="sent-pill sent-yes">Terkirim</span>
-                                @else
-                                    <span class="sent-pill sent-no">Belum</span>
-                                @endif
+                                    @if ($guest->invitation_sent_at)
+                                        <span class="lifecycle-pill lifecycle-pill-green">Undangan: Terkirim</span>
+                                    @else
+                                        <span class="lifecycle-pill lifecycle-pill-yellow">Undangan: Belum</span>
+                                    @endif
+
+                                    @if ($attendanceStatus === 'arrived')
+                                        <span class="lifecycle-pill lifecycle-pill-blue">Hari-H: Hadir</span>
+                                    @else
+                                        <span class="lifecycle-pill lifecycle-pill-muted">Hari-H: Belum</span>
+                                    @endif
+
+                                    @if ($souvenirStatus === 'given')
+                                        <span class="lifecycle-pill lifecycle-pill-green">Souvenir: Sudah</span>
+                                    @else
+                                        <span class="lifecycle-pill lifecycle-pill-muted">Souvenir: Belum</span>
+                                    @endif
+
+                                    <div class="lifecycle-money">
+                                        Amplop: Rp {{ number_format($envelopeAmount, 0, ',', '.') }}
+                                    </div>
+                                </div>
                             </td>
 
                             @php
@@ -1313,7 +1463,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="empty-state">
+                            <td colspan="6" class="empty-state">
                                 Belum ada data tamu. Tambahkan tamu pertama dari form di sebelah kiri.
                             </td>
                         </tr>

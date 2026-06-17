@@ -194,6 +194,66 @@ class GoogleSheetsClient
         return false;
     }
 
+    public function updateRowByKey(
+        string $sheetName,
+        string $keyHeader,
+        string $keyValue,
+        array $row,
+        ?array $headers = null,
+        string $range = 'A1:Z5000'
+    ): bool {
+        if (!$this->sheetExists($sheetName)) {
+            return false;
+        }
+
+        $values = $this->getValues($sheetName, $range);
+
+        if (count($values) < 1) {
+            return false;
+        }
+
+        $sheetHeaders = array_map(
+            fn ($header) => $this->normalizeHeader((string) $header),
+            $values[0]
+        );
+
+        $normalizedKeyHeader = $this->normalizeHeader($keyHeader);
+        $keyColumnIndex = array_search($normalizedKeyHeader, $sheetHeaders, true);
+
+        if ($keyColumnIndex === false) {
+            return false;
+        }
+
+        $targetRowNumber = null;
+
+        foreach (array_slice($values, 1) as $index => $sheetRow) {
+            $sheetValue = (string) ($sheetRow[$keyColumnIndex] ?? '');
+
+            if ($sheetValue === (string) $keyValue) {
+                $targetRowNumber = $index + 2;
+                break;
+            }
+        }
+
+        if (!$targetRowNumber) {
+            return false;
+        }
+
+        $columnCount = $headers ? count($headers) : max(count($sheetHeaders), count($row));
+        $endColumn = $this->columnLetter($columnCount);
+
+        $normalizedRow = $this->normalizeRowForSheets($row);
+        $normalizedRow = array_slice(array_pad($normalizedRow, $columnCount, ''), 0, $columnCount);
+
+        $this->updateRange(
+            $sheetName,
+            "A{$targetRowNumber}:{$endColumn}{$targetRowNumber}",
+            [$normalizedRow]
+        );
+
+        return true;
+    }
+
     private function columnLetter(int $columnNumber): string
     {
         $letter = '';

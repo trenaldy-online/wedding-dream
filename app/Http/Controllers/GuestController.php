@@ -172,7 +172,33 @@ class GuestController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
             'group_name' => ['nullable', 'string', 'max:255'],
+
+            /*
+             * Sistem 1: data awal undangan.
+             */
+            'total_invited' => ['nullable', 'integer', 'min:1'],
+
+            /*
+             * Sistem 2: RSVP dari tamu.
+             */
             'rsvp_status' => ['required', 'in:pending,attend,not_attend'],
+            'rsvp_count' => ['nullable', 'integer', 'min:0'],
+            'rsvp_note' => ['nullable', 'string'],
+
+            /*
+             * Sistem 3: data hari-H / setelah acara.
+             */
+            'invitation_status' => ['nullable', 'in:pending,sent'],
+            'attendance_status' => ['nullable', 'in:not_arrived,arrived'],
+            'actual_attendance_count' => ['nullable', 'integer', 'min:0'],
+            'envelope_amount' => ['nullable', 'integer', 'min:0'],
+            'souvenir_status' => ['nullable', 'in:not_given,given'],
+            'souvenir_count' => ['nullable', 'integer', 'min:0'],
+
+            /*
+             * Catatan manual.
+             */
+            'sync_note' => ['nullable', 'string'],
         ]);
 
         $event = WeddingEvent::findOrFail($validated['wedding_event_id']);
@@ -180,16 +206,55 @@ class GuestController extends Controller
         $validated['wedding_profile_id'] = $event->wedding_profile_id;
         $validated['invitation_code'] = $this->makeUniqueInvitationCode();
 
+        $validated['phone'] = $this->normalizeGuestPhone($validated['phone'] ?? null);
+
         /*
-         * Admin tidak menentukan jumlah hadir.
-         * Pending dan attend default 1.
-         * Tidak hadir otomatis 0.
-         * Jumlah final akan diisi oleh tamu saat RSVP.
+         * total_invited = kuota undangan.
+         * Jangan ditimpa oleh RSVP.
          */
+        $validated['total_invited'] = max(1, (int) ($validated['total_invited'] ?? 1));
+
+        /*
+         * rsvp_count = estimasi hadir dari sistem RSVP.
+         */
+        $validated['rsvp_count'] = max(0, (int) ($validated['rsvp_count'] ?? 0));
+
+        if ($validated['rsvp_status'] === 'attend' && $validated['rsvp_count'] < 1) {
+            $validated['rsvp_count'] = 1;
+        }
+
         if ($validated['rsvp_status'] === 'not_attend') {
-            $validated['total_invited'] = 0;
-        } else {
-            $validated['total_invited'] = 1;
+            $validated['rsvp_count'] = 0;
+        }
+
+        $validated['rsvp_confirmed_at'] = $validated['rsvp_status'] === 'pending'
+            ? null
+            : now();
+
+        $validated['invitation_sent_at'] = ($validated['invitation_status'] ?? 'pending') === 'sent'
+            ? now()
+            : null;
+
+        unset($validated['invitation_status']);
+
+        $validated['attendance_status'] = $validated['attendance_status'] ?? 'not_arrived';
+        $validated['actual_attendance_count'] = max(0, (int) ($validated['actual_attendance_count'] ?? 0));
+
+        $validated['checked_in_at'] = $validated['attendance_status'] === 'arrived'
+            ? now()
+            : null;
+
+        $validated['envelope_amount'] = max(0, (int) ($validated['envelope_amount'] ?? 0));
+
+        $validated['souvenir_status'] = $validated['souvenir_status'] ?? 'not_given';
+        $validated['souvenir_count'] = max(0, (int) ($validated['souvenir_count'] ?? 0));
+
+        if ($validated['souvenir_status'] === 'given' && $validated['souvenir_count'] < 1) {
+            $validated['souvenir_count'] = 1;
+        }
+
+        if ($validated['souvenir_status'] === 'not_given') {
+            $validated['souvenir_count'] = 0;
         }
 
         $guest = Guest::create($validated);
@@ -244,23 +309,89 @@ class GuestController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
             'group_name' => ['nullable', 'string', 'max:255'],
+
+            /*
+             * Sistem 1: data awal undangan.
+             */
+            'total_invited' => ['nullable', 'integer', 'min:1'],
+
+            /*
+             * Sistem 2: RSVP dari tamu.
+             */
             'rsvp_status' => ['required', 'in:pending,attend,not_attend'],
+            'rsvp_count' => ['nullable', 'integer', 'min:0'],
+            'rsvp_note' => ['nullable', 'string'],
+
+            /*
+             * Sistem 3: data hari-H / setelah acara.
+             */
+            'invitation_status' => ['nullable', 'in:pending,sent'],
+            'attendance_status' => ['nullable', 'in:not_arrived,arrived'],
+            'actual_attendance_count' => ['nullable', 'integer', 'min:0'],
+            'envelope_amount' => ['nullable', 'integer', 'min:0'],
+            'souvenir_status' => ['nullable', 'in:not_given,given'],
+            'souvenir_count' => ['nullable', 'integer', 'min:0'],
+
+            /*
+             * Catatan manual.
+             */
+            'sync_note' => ['nullable', 'string'],
         ]);
 
         $event = WeddingEvent::findOrFail($validated['wedding_event_id']);
 
         $validated['wedding_profile_id'] = $event->wedding_profile_id;
+        $validated['phone'] = $this->normalizeGuestPhone($validated['phone'] ?? null);
 
-        if ($validated['rsvp_status'] === 'pending') {
-            $validated['total_invited'] = 1;
+        /*
+         * total_invited = kuota undangan.
+         * Jangan ditimpa oleh RSVP.
+         */
+        $validated['total_invited'] = max(1, (int) ($validated['total_invited'] ?? $guest->total_invited ?? 1));
+
+        /*
+         * rsvp_count = estimasi hadir dari sistem RSVP.
+         */
+        $validated['rsvp_count'] = max(0, (int) ($validated['rsvp_count'] ?? 0));
+
+        if ($validated['rsvp_status'] === 'attend' && $validated['rsvp_count'] < 1) {
+            $validated['rsvp_count'] = 1;
         }
 
         if ($validated['rsvp_status'] === 'not_attend') {
-            $validated['total_invited'] = 0;
+            $validated['rsvp_count'] = 0;
         }
 
-        if ($validated['rsvp_status'] === 'attend') {
-            $validated['total_invited'] = max(1, (int) $guest->total_invited);
+        if ($validated['rsvp_status'] === 'pending') {
+            $validated['rsvp_confirmed_at'] = null;
+        } else {
+            $validated['rsvp_confirmed_at'] = $guest->rsvp_confirmed_at ?: now();
+        }
+
+        $validated['invitation_sent_at'] = ($validated['invitation_status'] ?? 'pending') === 'sent'
+            ? ($guest->invitation_sent_at ?: now())
+            : null;
+
+        unset($validated['invitation_status']);
+
+        $validated['attendance_status'] = $validated['attendance_status'] ?? 'not_arrived';
+        $validated['actual_attendance_count'] = max(0, (int) ($validated['actual_attendance_count'] ?? 0));
+
+        $validated['checked_in_at'] = $validated['attendance_status'] === 'arrived'
+            ? ($guest->checked_in_at ?: now())
+            : null;
+
+        $validated['envelope_amount'] = max(0, (int) ($validated['envelope_amount'] ?? 0));
+
+        $validated['souvenir_status'] = $validated['souvenir_status'] ?? 'not_given';
+        $validated['souvenir_count'] = max(0, (int) ($validated['souvenir_count'] ?? 0));
+
+        if ($validated['souvenir_status'] === 'given' && $validated['souvenir_count'] < 1) {
+            $validated['souvenir_count'] = 1;
+        }
+
+        if ($validated['souvenir_status'] === 'not_given') {
+            $validated['souvenir_count'] = 0;
         }
 
         $guest->update($validated);
@@ -302,6 +433,29 @@ class GuestController extends Controller
         return redirect()
             ->route('guests.index', ['event_id' => $eventId])
             ->with('success', 'Tamu berhasil dihapus.');
+    }
+
+    private function normalizeGuestPhone(?string $phone): ?string
+    {
+        if (!$phone) {
+            return null;
+        }
+
+        $phone = preg_replace('/\D+/', '', $phone);
+
+        if (!$phone) {
+            return null;
+        }
+
+        if (str_starts_with($phone, '0')) {
+            return '62' . substr($phone, 1);
+        }
+
+        if (str_starts_with($phone, '8')) {
+            return '62' . $phone;
+        }
+
+        return $phone;
     }
 
     private function makeUniqueInvitationCode(): string

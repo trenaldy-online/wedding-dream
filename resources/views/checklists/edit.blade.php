@@ -456,6 +456,11 @@
 @endpush
 
 @section('content')
+@php
+    $currentChecklistCategory = old('category', isset($checklist) ? ($checklist->category ?? '') : 'Persiapan');
+    $isDocumentChecklist = in_array(strtolower(trim((string) $currentChecklistCategory)), ['dokumen', 'dokumen nikah'], true);
+@endphp
+
 <section class="checklist-page">
     <div class="checklist-overview-grid">
         <div class="checklist-hero-card">
@@ -476,13 +481,7 @@
                     <div>
                         <div class="checklist-progress-label">Status Saat Ini</div>
                         <div class="checklist-progress-value">
-                            @if ($checklist->status === 'done')
-                                Selesai
-                            @elseif ($checklist->status === 'in_progress')
-                                Proses
-                            @else
-                                Belum
-                            @endif
+                            {{ ($statusOptions ?? [])[$checklist->status] ?? 'Belum' }}
                         </div>
                     </div>
 
@@ -525,15 +524,20 @@
                 </div>
 
                 <div class="checklist-side-item">
+                    <span>Prioritas</span>
+                    <strong>{{ $checklist->priority ?: 'Wajib' }}</strong>
+                </div>
+
+                <div class="checklist-side-item">
                     <span>Deadline</span>
                     <strong>
-                        {{ $checklist->due_date ? $checklist->due_date->translatedFormat('d M Y') : '-' }}
+                        {{ $checklist->due_date ? $checklist->due_date->format('d/m/Y') : '-' }}
                     </strong>
                 </div>
 
                 <div class="checklist-side-item">
                     <span>Dibuat</span>
-                    <strong>{{ $checklist->created_at->translatedFormat('d M Y') }}</strong>
+                    <strong>{{ $checklist->created_at->format('d/m/Y') }}</strong>
                 </div>
             </div>
         </div>
@@ -584,18 +588,24 @@
 
                 <div class="form-group">
                     <label class="form-label">Kategori</label>
-                    <select name="category" class="form-select">
-                        <option value="">-- Pilih Kategori --</option>
+                    <input
+                        type="text"
+                        name="category"
+                        class="form-control"
+                        list="checklist-category-options"
+                        value="{{ old('category', $checklist->category ?: 'Persiapan') }}"
+                        placeholder="Contoh: Persiapan, Dokumen Nikah, Vendor"
+                    >
 
-                        @foreach (['Dokumen', 'Keluarga', 'Busana', 'Mahar', 'Vendor', 'Acara', 'Kesehatan', 'Lainnya'] as $category)
-                            <option
-                                value="{{ $category }}"
-                                {{ old('category', $checklist->category) === $category ? 'selected' : '' }}
-                            >
-                                {{ $category }}
-                            </option>
+                    <datalist id="checklist-category-options">
+                        @foreach (($categoryOptions ?? collect()) as $category)
+                            <option value="{{ $category }}"></option>
                         @endforeach
-                    </select>
+                    </datalist>
+
+                    <div class="form-help">
+                        Gunakan kategori <strong>Dokumen Nikah</strong> jika item ini adalah berkas/dokumen. Selain itu akan masuk ke Persiapan Nikah.
+                    </div>
                 </div>
             </div>
 
@@ -617,27 +627,40 @@
                     </select>
                 </div>
 
+                <div class="form-group js-priority-group" style="{{ $isDocumentChecklist ? 'display:none;' : '' }}">
+                    <label class="form-label">Prioritas</label>
+                    <select name="priority" class="form-select" {{ $isDocumentChecklist ? 'disabled' : '' }}>
+                        @foreach (($priorityOptions ?? ['Wajib' => 'Wajib']) as $value => $label)
+                            <option value="{{ $value }}" {{ old('priority', $checklist->priority ?: 'Wajib') === $value ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <div class="form-help">
+                        Pilihan dibuat sama dengan dropdown di Google Sheet: Wajib, Penting, Opsional, Bisa Ditunda.
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
-                        <option value="todo" {{ old('status', $checklist->status) === 'todo' ? 'selected' : '' }}>
-                            Belum Dikerjakan
-                        </option>
-
-                        <option value="in_progress" {{ old('status', $checklist->status) === 'in_progress' ? 'selected' : '' }}>
-                            Dalam Proses
-                        </option>
-
-                        <option value="done" {{ old('status', $checklist->status) === 'done' ? 'selected' : '' }}>
-                            Selesai
-                        </option>
+                        @foreach (($statusOptions ?? ['todo' => 'Belum']) as $value => $label)
+                            <option value="{{ $value }}" {{ old('status', $checklist->status) === $value ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
                     </select>
+
+                    <div class="form-help">
+                        Status mengikuti sheet: Belum, Proses, Selesai, Ditunda, Batal.
+                    </div>
                 </div>
             </div>
 
             <div class="form-grid-1" style="margin-top: 18px;">
                 <div class="form-group">
-                    <label class="form-label">Target Tanggal</label>
+                    <label class="form-label">Deadline</label>
                     <input
                         type="date"
                         name="due_date"
@@ -669,4 +692,62 @@
         </form>
     </div>
 </section>
+
+<script id="checklist-priority-toggle-script">
+document.addEventListener('DOMContentLoaded', function () {
+    const categoryFields = document.querySelectorAll('input[name="category"], select[name="category"]');
+
+    function normalize(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[_-]+/g, ' ')
+            .replace(/\s+/g, ' ');
+    }
+
+    function isDocumentCategory(value) {
+        const text = normalize(value);
+
+        return text === 'dokumen' || text === 'dokumen nikah';
+    }
+
+    categoryFields.forEach(function (categoryField) {
+        const form = categoryField.closest('form') || document;
+        const priorityField = form.querySelector('[name="priority"]');
+
+        if (!priorityField) {
+            return;
+        }
+
+        const priorityGroup = form.querySelector('.js-priority-group')
+            || priorityField.closest('.form-group')
+            || priorityField.parentElement;
+
+        function refreshPriorityVisibility() {
+            const isDocument = isDocumentCategory(categoryField.value);
+
+            if (priorityGroup) {
+                priorityGroup.style.display = isDocument ? 'none' : '';
+            }
+
+            priorityField.disabled = isDocument;
+
+            if (isDocument) {
+                priorityField.value = '';
+                return;
+            }
+
+            if (!priorityField.value) {
+                priorityField.value = 'Wajib';
+            }
+        }
+
+        categoryField.addEventListener('input', refreshPriorityVisibility);
+        categoryField.addEventListener('change', refreshPriorityVisibility);
+
+        refreshPriorityVisibility();
+    });
+});
+</script>
+
 @endsection
