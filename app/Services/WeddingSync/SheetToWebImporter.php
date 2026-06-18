@@ -305,7 +305,7 @@ class SheetToWebImporter
             'assigned_to' => $this->normalizeAssignedTo($payload['assigned_to'] ?? $payload['event_side'] ?? null),
             'status' => $status,
             'due_date' => $payload['due_date'] ?? null,
-            'priority' => $this->value($payload, 'priority') ?: 'Wajib',
+            'priority' => $isDocument ? null : ($this->value($payload, 'priority') ?: 'Wajib'),
             'note' => $this->value($payload, 'sync_note'),
             'completed_at' => $status === 'done' ? now() : null,
 

@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ChecklistItem extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'wedding_profile_id',
         'wedding_event_id',

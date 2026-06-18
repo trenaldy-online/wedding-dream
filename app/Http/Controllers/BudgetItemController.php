@@ -56,7 +56,8 @@ class BudgetItemController extends Controller
             'totalItems',
             'paidItems',
             'partialItems',
-            'unpaidItems'
+            'unpaidItems',
+            'categoryOptions'
         ));
     }
 
@@ -94,7 +95,10 @@ class BudgetItemController extends Controller
             ->orderBy('event_name')
             ->get();
 
-        return view('budget.edit', compact('budgetItem', 'profile', 'events'));
+        
+        $categoryOptions = $this->budgetCategoryOptions();
+
+        return view('budget.edit', compact('budgetItem', 'profile', 'events', 'categoryOptions'));
     }
 
     public function update(Request $request, BudgetItem $budgetItem)

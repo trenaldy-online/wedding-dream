@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\WeddingSyncV2StatusController;
+
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\BudgetItemController;
 use App\Http\Controllers\DashboardController;
@@ -146,3 +148,5 @@ Route::get('/templates/anselma-preview', [AnselmaPreviewController::class, 'show
 
 Route::view('/templates/anselma-original-cover', 'templates.anselma.original-cover')
     ->name('templates.anselma.original-cover');
+
+Route::get('/sync-v2-status', [WeddingSyncV2StatusController::class, 'index'])->name('sync-v2.status');

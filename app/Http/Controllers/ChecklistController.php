@@ -104,23 +104,9 @@ class ChecklistController extends Controller
             'note' => ['nullable', 'string'],
         ]);
 
-        $validated['category'] = trim((string) ($validated['category'] ?? '')) ?: 'Persiapan';
-        $validated['priority'] = $validated['priority'] ?? 'Wajib';
+        
+        $validated = $this->normalizeChecklistPayload($validated);
 
-        $validated['category'] = trim((string) ($validated['category'] ?? '')) ?: 'Persiapan';
-        $validated['priority'] = $validated['priority'] ?? 'Wajib';
-
-        $validated['category'] = trim((string) ($validated['category'] ?? ''));
-
-        if ($validated['category'] === '') {
-            $validated['category'] = 'Persiapan';
-        }
-
-        if (in_array(strtolower($validated['category']), ['dokumen', 'dokumen nikah'], true)) {
-            $validated['category'] = 'Dokumen Nikah';
-        }
-
-        $validated['priority'] = $validated['priority'] ?? 'Wajib';
 
         $profile = WeddingProfile::first();
 
@@ -177,17 +163,9 @@ class ChecklistController extends Controller
             'note' => ['nullable', 'string'],
         ]);
 
-        $validated['category'] = trim((string) ($validated['category'] ?? ''));
+        
+        $validated = $this->normalizeChecklistPayload($validated);
 
-        if ($validated['category'] === '') {
-            $validated['category'] = 'Persiapan';
-        }
-
-        if (in_array(strtolower($validated['category']), ['dokumen', 'dokumen nikah'], true)) {
-            $validated['category'] = 'Dokumen Nikah';
-        }
-
-        $validated['priority'] = $validated['priority'] ?? 'Wajib';
 
         $profile = WeddingProfile::first();
 
@@ -234,6 +212,34 @@ class ChecklistController extends Controller
             ->route('checklists.index', ['event_id' => $eventId ?: 'global'])
             ->with('success', 'Checklist berhasil dihapus.');
     }
+
+    private function normalizeChecklistPayload(array $validated): array
+    {
+        $category = trim((string) ($validated['category'] ?? ''));
+
+        if ($category === '') {
+            $category = 'Persiapan';
+        }
+
+        $normalizedCategory = strtolower(str_replace(['_', '-'], ' ', $category));
+        $normalizedCategory = preg_replace('/\s+/', ' ', $normalizedCategory);
+
+        if (in_array($normalizedCategory, ['dokumen', 'dokumen nikah'], true)) {
+            $validated['category'] = 'Dokumen Nikah';
+            $validated['priority'] = null;
+
+            return $validated;
+        }
+
+        $validated['category'] = $category;
+
+        if (empty($validated['priority'])) {
+            $validated['priority'] = 'Wajib';
+        }
+
+        return $validated;
+    }
+
     private function checklistCategoryOptions()
     {
         $defaults = collect([

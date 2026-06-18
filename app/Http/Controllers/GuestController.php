@@ -264,7 +264,7 @@ class GuestController extends Controller
             'guest_id' => $guest->id,
             'guest_name' => $guest->name,
             'guest_slug' => Str::slug($guest->name) ?: 'tamu-' . $guest->id,
-            'token' => $guest->invitation_code,
+            'token' => $guest->invitation_code ?: Str::random(40),
             'is_active' => true,
             'device_warning_threshold' => 3,
             'open_count' => 0,
@@ -402,7 +402,7 @@ class GuestController extends Controller
                 'wedding_profile_id' => $guest->wedding_profile_id,
                 'guest_name' => $guest->name,
                 'guest_slug' => Str::slug($guest->name) ?: 'tamu-' . $guest->id,
-                'token' => $guest->invitation_code,
+                'token' => $guest->invitation_code ?: Str::random(40),
                 'is_active' => true,
                 'device_warning_threshold' => 3,
             ]

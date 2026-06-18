@@ -53,7 +53,12 @@ class ReconcileWeddingSync extends Command
         SyncPayloadBuilder $payloadBuilder,
         SyncHasher $hasher
     ): int {
-        $selectedModules = $this->selectedModules();
+                if (! config('wedding-sync-legacy.enabled', false)) {
+            $this->warn(config('wedding-sync-legacy.message', 'Sync lama sudah dinonaktifkan. Gunakan Wedding Sync V2.'));
+            return self::SUCCESS;
+        }
+
+$selectedModules = $this->selectedModules();
 
         $run = SyncRun::create([
             'run_type' => 'manual_reconcile',

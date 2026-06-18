@@ -1,4 +1,3 @@
-@extends('layouts.app', ['title' => 'Sinkronisasi Google Sheet'])
 
 @push('styles')
 <style>
@@ -431,7 +430,6 @@
 <div class="sync-layout">
     <div class="page-heading">
         <div>
-            <h1 class="page-title">Sinkronisasi Google Sheet</h1>
             <div class="page-date">
                 <span>↔</span>
                 Web dan Google Sheet
@@ -451,7 +449,6 @@
 
     <div class="sync-panel-hero">
         <div class="sync-safe-pill">↔ Review Only Mode</div>
-        <h2 class="sync-panel-hero-title">Cek Perbedaan Data Sebelum Sinkronisasi</h2>
         <p class="sync-panel-hero-text">
             Halaman ini membandingkan data Google Sheet dan database web. Sistem hanya membuat laporan perbedaan,
             sehingga data asli belum ditimpa otomatis. Gunakan tombol <strong>Import ke Web</strong> hanya untuk data

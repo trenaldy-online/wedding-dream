@@ -525,7 +525,7 @@
 
                 <div class="checklist-side-item">
                     <span>Prioritas</span>
-                    <strong>{{ $checklist->priority ?: 'Wajib' }}</strong>
+                    <strong>{{ $isDocumentChecklist ? '-' : ($checklist->priority ?: 'Wajib') }}</strong>
                 </div>
 
                 <div class="checklist-side-item">
@@ -557,7 +557,7 @@
 
             <div class="form-grid-1">
                 <div class="form-group">
-                    <label class="form-label">Acara</label>
+                    <label class="form-label">pilih event / acara tujuan checklist</label>
 
                     <select name="wedding_event_id" class="form-select">
                         <option value="">Checklist Umum</option>
@@ -611,7 +611,7 @@
 
             <div class="form-grid-2" style="margin-top: 18px;">
                 <div class="form-group">
-                    <label class="form-label">Untuk Siapa?</label>
+                    <label class="form-label">PIC / Penanggung Jawab?</label>
                     <select name="assigned_to" class="form-select">
                         <option value="both" {{ old('assigned_to', $checklist->assigned_to) === 'both' ? 'selected' : '' }}>
                             Bersama
@@ -721,6 +721,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const priorityGroup = form.querySelector('.js-priority-group')
             || priorityField.closest('.form-group')
+            || priorityField.closest('.mb-3')
             || priorityField.parentElement;
 
         function refreshPriorityVisibility() {

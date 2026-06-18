@@ -40,9 +40,9 @@
                 <a href="{{ route('checklists.index') }}" class="{{ request()->routeIs('checklists.*') ? 'active' : '' }}">
                     Checklist
                 </a>
+                    <a href="{{ url('/sync-v2-status') }}" class="text-sm font-medium {{ request()->is('sync-v2-status') ? 'text-amber-600' : 'text-slate-600 hover:text-slate-900' }}">Sync Status</a>
 
                 <a href="{{ route('sync.index') }}" class="{{ request()->routeIs('sync.*') ? 'active' : '' }}">
-                    Sinkronisasi
                 </a>
             </nav>
 

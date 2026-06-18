@@ -595,7 +595,7 @@
                 @csrf
 
                 <div class="form-group">
-                    <label class="form-label">Acara</label>
+                    <label class="form-label">pilih event / acara tujuan checklist</label>
 
                     <select name="wedding_event_id" class="form-select">
                         <option value="">Checklist Umum</option>
@@ -661,7 +661,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Untuk Siapa?</label>
+                    <label class="form-label">PIC / Penanggung Jawab?</label>
                     <select name="assigned_to" class="form-select">
                         <option value="both" {{ old('assigned_to') === 'both' ? 'selected' : '' }}>
                             Bersama
@@ -782,7 +782,7 @@
 
                                 <td>
                                     <span class="checklist-category-pill">
-                                        {{ $item->priority ?: 'Wajib' }}
+                                        {{ in_array(strtolower(trim((string) $item->category)), ['dokumen', 'dokumen nikah'], true) ? '-' : ($item->priority ?: 'Wajib') }}
                                     </span>
                                 </td>
 
@@ -907,6 +907,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const priorityGroup = form.querySelector('.js-priority-group')
             || priorityField.closest('.form-group')
+            || priorityField.closest('.mb-3')
             || priorityField.parentElement;
 
         function refreshPriorityVisibility() {
